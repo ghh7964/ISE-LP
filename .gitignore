@@ -1,0 +1,10 @@
+# 이 레포에는 발표 시나리오, 수업지도안, 발표 자료만 올린다
+/*
+!/.gitignore
+!/README.md
+!/index.html
+!/.nojekyll
+!/발표_시나리오.md
+!/수업지도안_중학교_세안.md
+!/발표/
+.DS_Store

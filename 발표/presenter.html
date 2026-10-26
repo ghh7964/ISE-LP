@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>발표자 화면</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Noto+Serif+KR:wght@700&display=swap">
+<style>
+  :root { --paper: #F7F3EB; --ink: #1B1A18; --ink-2: #4B4740; --ink-3: #8A847A; --hair: rgba(27,26,24,.16); --navy: #213A63; --navy-tint: #E1E7F1; --late: #B3402E; }
+  * { box-sizing: border-box; }
+  html { forced-color-adjust: none; }
+  html, body { margin: 0; height: 100%; }
+  body { font-family: "Noto Sans KR", sans-serif; background: var(--paper); color: var(--ink); display: grid; grid-template-rows: auto 1fr auto; }
+  header { display: grid; grid-template-columns: 1fr auto; gap: 24px; padding: 20px 28px 16px; border-bottom: 1px solid var(--hair); align-items: end; }
+  .now small, .next small { display: block; font-size: 12px; color: var(--ink-3); margin-bottom: 2px; }
+  .now b { font-family: "Noto Serif KR", serif; font-size: 26px; }
+  .now .who { font-size: 15px; color: var(--navy); margin-left: 12px; font-weight: 700; }
+  .next { margin-top: 8px; font-size: 15px; color: var(--ink-2); }
+  .clock { text-align: right; }
+  .clock .t { font-family: "Noto Serif KR", serif; font-size: 48px; font-variant-numeric: tabular-nums; line-height: 1; }
+  .clock .goal { font-size: 14px; color: var(--ink-3); margin-top: 6px; }
+  .clock.late .goal { color: var(--late); font-weight: 700; }
+  main { overflow: auto; padding: 18px 28px 40px; font-size: 21px; line-height: 1.75; }
+  main h2 { display: none; }
+  main p { margin: 0 0 14px; }
+  main ul { margin: 0 0 14px; padding-left: 22px; }
+  main strong { font-weight: 700; }
+  main em { color: var(--ink-3); }
+  .mark { color: var(--ink-3); font-size: 15px; font-weight: 700; white-space: nowrap; }
+  .mark.done { color: var(--ink-3); opacity: .55; }
+  .mark.here { color: #fff; background: var(--navy); padding: 2px 8px; }
+  .mark.up { color: var(--navy); border: 1px solid var(--navy); padding: 1px 7px; }
+  footer { display: flex; gap: 10px; padding: 12px 28px; border-top: 1px solid var(--hair); align-items: center; }
+  footer button { font: 700 16px "Noto Sans KR", sans-serif; padding: 10px 20px; border: 1px solid var(--ink); background: #fff; cursor: pointer; }
+  footer button.main { background: var(--ink); color: #fff; }
+  footer .pos { margin-left: auto; font-size: 14px; color: var(--ink-3); }
+  .warn { padding: 30px; color: var(--ink-2); }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <div class="now"><small>지금</small><b id="label">연결 대기 중</b><span class="who" id="who"></span></div>
+    <div class="next"><small>다음</small><span id="next">발표 화면에서 P 키를 누르면 이 창이 연결됩니다</span></div>
+  </div>
+  <div class="clock" id="clock"><div class="t" id="t">0:00</div><div class="goal" id="goal">발표 시작 전</div></div>
+</header>
+<main id="script"><div class="warn">대본을 불러오는 중…</div></main>
+<footer>
+  <button id="b-prev">◀ 이전</button>
+  <button id="b-next" class="main">다음 ▶</button>
+  <button id="b-reset">타이머 다시</button>
+  <span class="pos" id="pos"></span>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="content/script.snapshot.js"></script>
+<script src="js/core.js"></script>
+<script src="js/content.js"></script>
+<script>
+(async function () {
+  const $ = (s) => document.querySelector(s);
+  let st = null;
+  try { await D.content.load(); } catch (e) { $('#script').innerHTML = `<div class="warn">${e.message}</div>`; }
+  const sections = D.content.sections || {};
+  marked.use({ renderer: { del: (text) => `~${text}~` } });
+
+  let bc = null;
+  try { bc = new BroadcastChannel('gacha-deck'); } catch (e) {}
+  // 세 경로 중 열려 있는 것으로 모두 보내고, 받는 쪽은 id 로 한 번만 처리한다
+  function send(m) {
+    m = Object.assign({ id: Date.now() + '-' + Math.random().toString(36).slice(2) }, m);
+    if (bc) bc.postMessage(m);
+    if (window.opener && !window.opener.closed) window.opener.postMessage(m, '*');
+    try { localStorage.setItem('gacha-deck-cmd', JSON.stringify(Object.assign({ at: Date.now() }, m))); } catch (e) {}
+  }
+  const nav = (cmd, extra) => send(Object.assign({ type: 'nav', cmd }, extra));
+  $('#b-prev').onclick = () => nav('prev');
+  $('#b-next').onclick = () => nav('next');
+  $('#b-reset').onclick = () => nav('resetTimer');
+  window.addEventListener('keydown', (e) => {
+    if (['ArrowRight', 'PageDown', ' ', 'Enter'].includes(e.key)) { e.preventDefault(); nav('next'); }
+    if (['ArrowLeft', 'PageUp', 'Backspace'].includes(e.key)) { e.preventDefault(); nav('prev'); }
+  });
+
+  let shownScene = null;
+  function render(m) {
+    st = m;
+    $('#label').textContent = m.label;
+    $('#who').textContent = m.speaker || '';
+    $('#next').textContent = m.next;
+    $('#pos').textContent = `${m.idx + 1} / ${m.total}  ·  장면 ${m.scene.slice(1)}`;
+    if (shownScene !== m.scene) {
+      shownScene = m.scene;
+      const sec = sections[m.scene];
+      $('#script').innerHTML = sec ? marked.parse(sec.md) : '<div class="warn">이 장면의 대본이 없습니다</div>';
+      $('#script').scrollTop = 0;
+    }
+    // 장면 안의 n번째 ▶ 가 지금 단계
+    const marks = Array.from(document.querySelectorAll('#script strong')).filter((s) => s.textContent.trim().startsWith('▶'));
+    marks.forEach((s, i) => {
+      s.className = 'mark ' + (i < m.sub ? 'done' : i === m.sub ? 'here' : i === m.sub + 1 ? 'up' : '');
+    });
+    const here = marks[m.sub];
+    if (here) here.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    tick();
+  }
+  function tick() {
+    if (!st) return;
+    const el = $('#clock');
+    if (!st.t0) { $('#t').textContent = '0:00'; $('#goal').textContent = '발표 시작 전'; return; }
+    const s = Math.floor((Date.now() - st.t0) / 1000);
+    $('#t').textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+    const end = st.sceneEnd && st.sceneEnd[st.scene];
+    if (end) {
+      const left = end - s;
+      $('#goal').textContent = left >= 0
+        ? `이 장면은 ${Math.floor(end / 60)}:${String(end % 60).padStart(2, '0')}까지 (${left}초 남음)`
+        : `목표보다 ${-left}초 늦음`;
+      el.classList.toggle('late', left < 0);
+    } else $('#goal').textContent = '';
+  }
+  setInterval(tick, 500);
+
+  const onMsg = (m) => { if (m && m.type === 'state') render(m); };
+  if (bc) bc.onmessage = (e) => onMsg(e.data);
+  window.addEventListener('message', (e) => onMsg(e.data));
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'gacha-deck-state' && e.newValue) { try { onMsg(JSON.parse(e.newValue)); } catch (err) {} }
+  });
+  try { const last = JSON.parse(localStorage.getItem('gacha-deck-state') || 'null'); if (last) render(last); } catch (e) {}
+  send({ type: 'hello' });
+})();
+</script>
+</body>
+</html>
