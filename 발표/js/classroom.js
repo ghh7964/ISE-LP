@@ -314,15 +314,19 @@
     g.userData.screen = scr;
     return g;
   }
-  function sphereBalls(n = 10, r = 0.028, geo = null, flat = false) {
+  // 뽑기통 캡슐 10개: 겉모양이 모두 같다. 금·은·동 토큰은 캡슐 안에 있어 열어야 보인다 (만져서 골라 뽑을 수 없게)
+  function capsules(n = 10, r = 0.028) {
     const g = new T.Group();
-    const colors = [D.RARITY.g.hex].concat(Array(3).fill(D.RARITY.s.hex), Array(6).fill(D.RARITY.b.hex));
-    const ge = geo || new T.SphereGeometry(r, 14, 10);
-    colors.slice(0, n).forEach((c, i) => {
-      const b = mesh(ge, mat(c, { roughness: flat ? 0.9 : 0.4, metalness: flat ? 0 : 0.3, flatShading: flat }),
-        Math.cos(i * 2.4) * 0.07, r + (i > 5 ? r * 1.6 : 0), Math.sin(i * 2.4) * 0.07);
-      g.add(b);
-    });
+    const top = new T.SphereGeometry(r, 14, 6, 0, Math.PI * 2, 0, Math.PI / 2);
+    const bot = new T.SphereGeometry(r, 14, 6, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2);
+    const topM = mat(0xF2EEE6, { roughness: 0.35 }), botM = mat(0x7F9BAE, { roughness: 0.35 });
+    for (let i = 0; i < n; i++) {
+      const c = new T.Group();
+      c.add(mesh(top, topM, 0, 0, 0), mesh(bot, botM, 0, 0, 0));
+      c.position.set(Math.cos(i * 2.4) * 0.07, r + (i > 5 ? r * 1.6 : 0), Math.sin(i * 2.4) * 0.07);
+      c.rotation.set(i * 1.3, i * 0.7, i * 2.1);
+      g.add(c);
+    }
     return g;
   }
 
@@ -396,7 +400,7 @@
         cyl.position.y = 0.11;
         bin.add(cyl);
         bin.add(mesh(new T.CylinderGeometry(0.135, 0.135, 0.012, 24), mat(0xD6D0C4), 0, 0.006, 0));
-        bin.add(sphereBalls());
+        bin.add(capsules());
         g.add(bin);
         R.props.bins.push(bin);
         const stk = glowMat(0xFFFFFF);
@@ -690,7 +694,7 @@
     rules.position.set(-3.73, 1.75, -2.85);
     rules.rotation.y = Math.PI / 2;
     MOD[3] = { objs: [add(calm), add(rules)] };
-    // 4 시각장애: 공은 크기·모양이 모두 같다 (손으로 골라 뽑을 수 없게). 뽑은 뒤 공의 촉각 스티커를 범례판에 대 보고 색을 안다. 활동지는 고대비로.
+    // 4 시각장애: 토큰은 겉모양이 같은 캡슐 안에 있다 (손으로 골라 뽑을 수 없게). 캡슐을 연 뒤 토큰의 촉각 점(금 1 · 은 2 · 동 3)을 범례판에 대 보고 색을 안다. 활동지는 고대비로.
     const legends = onTables(1, () => {
       const g = new T.Group();
       g.add(mesh(rbox(0.17, 0.014, 0.24, 0.005), glowMat(0x1B1A18), 0, 0.007, 0));
