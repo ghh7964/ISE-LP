@@ -90,7 +90,7 @@
     { scene: 's9', label: '1,000명 × 10번', set: { overlay: 'crowd:run' }, action: ['crowd', 'run'] },
     { scene: 's9', label: '결과: 약 68%가 손해', set: { overlay: 'crowd:verdict' } },
     { scene: 's9', label: '칠판: 지원은 모두에게 열려 있다', set: { overlay: null, night: false, letterbox: false, panel: true, cam: 'board', board: 'final',
-        doc: [{ sel: 'li', text: '세 교과가 하나의 질문' }, { sel: 'li', text: '통합교육에 적합한 구조다' }] },
+        doc: [{ sel: 'li', text: '세 교과가 하나의 질문' }, { sel: 'li', text: '장애 학생도 적극적인 수업 참여' }] },
       fx: { camDur: 2.6, dayDur: 2.0, lbAt: 0.4, panelAt: 1.4 } },
 
     // s10 마무리
