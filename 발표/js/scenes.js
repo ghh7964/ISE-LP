@@ -73,6 +73,8 @@
         doc: [{ col: '개별 지원', strong: 'A' }] } },
     { scene: 's7', label: '모두를 위한 지원', set: { lens: 'all', pins: [], overlay: 'note:all',
         doc: [{ sel: 'p', text: '모두에게 주는 기본 설계' }] } },
+    { scene: 's7', label: '다른 학생이 오면: 같은 책상에 하나만 더한다', set: { overlay: 'ext', cam: 'roomL',
+        doc: [{ sel: 'p', text: '같은 설계 위에 지원을 더하면' }] } },
 
     // s8 3막 · 답
     { scene: 's8', label: '다시 밤: 처음 질문으로', set: { lens: null, overlay: 'crowd:intro', night: true, letterbox: true, panel: false, cam: 'machine',
@@ -88,5 +90,5 @@
   ];
 
   // 장면별 목표 시간 (발표_시나리오.md 표와 같다, 초 단위로 장면이 끝나야 하는 시각)
-  D.SCENE_END = { s1: 45, s2: 135, s3: 220, s4: 310, s5: 395, s6: 465, s7: 515, s8: 580, s9: 600 };
+  D.SCENE_END = { s1: 45, s2: 135, s3: 220, s4: 310, s5: 395, s6: 465, s7: 525, s8: 585, s9: 600 };
 })();

@@ -461,19 +461,20 @@
       <div class="cp-grp">교과 역량</div>
       <div class="cp-subj">${SUBJ.map(([k, d]) => `<div><b>${k}</b><span>${d}</span></div>`).join('')}</div>
       <div class="cp-foot"><div><b>기초소양</b> 수리 · 디지털 · 언어 (어휘 풀이 카드)</div>
-        <div class="cp-a"><b>학생 A</b> 기본교육과정: 자율생활 · 대인관계 · 정보처리 · 연결</div></div></div></div>`,
+        <div class="cp-a"><b>학생 A</b> <mark>기본교육과정: 자율생활 · 대인관계 · 정보처리 · 연결</mark></div></div></div></div>`,
     enter(tl, at) {
       tl.fromTo(this.q('.sheet'), { x: 50, rotation: 2, opacity: 0 }, { x: 0, rotation: 0.5, opacity: 1, duration: 0.7, ease: 'power3.out' }, at);
       tl.fromTo(this.qa('.cp-row, .cp-subj > div, .cp-foot > div'), { opacity: 0, x: 14 }, { opacity: 1, x: 0, duration: 0.4, stagger: 0.09 }, at + 0.5);
+      write(tl, this.qa('.cp-row .chip'), at + 1.1, 0.1);
     },
   });
 
   // ── 학생 A: 학생 기록 카드 (지도안 Ⅳ.2) ──────────────
   const PF_BODY = {
     who: `<div class="tb-h">특성</div>${li([
-      '그림 · 영상 같은 <b>시각 정보는 빨리 이해</b>한다',
-      '말로 된 <b>여러 단계 지시는 놓친다</b>',
-      '같은 순서와 규칙을 좋아하고, <b>정해진 절차가 있으면 끝까지 해낸다</b>',
+      '그림 · 영상 같은 <mark>시각 정보는 빨리 이해</mark>한다',
+      '말로 된 <mark>여러 단계 지시는 놓친다</mark>',
+      '같은 순서와 규칙을 좋아하고, <mark>정해진 절차가 있으면 끝까지 해낸다</mark>',
       '예고 없는 전환과 큰 소리에 불안해한다',
     ])}<div class="tb-note"><b>지원 요구</b> 제한적 지원: 그림 단서 · 영상 시범 · 전환 예고 · 할 말을 적은 역할 카드 · 소음 조절</div>`,
     level: `<div class="tb-h">현행수준</div><dl class="lv">
@@ -482,7 +483,8 @@
       <dt>의사소통</dt><dd>2~3어절로 답한다. 할 말 카드가 있으면 또래에게 말한다</dd>
       <dt>행동·감각</dt><dd>큰 소리에 귀를 막는다. 헤드폰에 익숙하다. 15분이 넘으면 집중이 흐트러진다</dd>
       <dt>기기</dt><dd>태블릿 영상을 스스로 재생 · 정지 · 되감기한다</dd>
-      <dt class="key">학습 방식</dt><dd class="key">시범을 직접 보거나 <b>영상으로 볼 때 가장 잘 따라 한다</b></dd></dl>`,
+      <dt>학습 방식</dt><dd>시범을 직접 보거나 <mark>영상으로 볼 때 가장 잘 따라 한다</mark></dd></dl>
+      <div class="pn pn-lv">↳ 그래서 영상 시범으로 가르친다</div>`,
     iep: `<div class="tb-h">IEP 목표 <small>2학기 단기 목표</small></div><div class="iep">
       <div><b>수학(자료)</b><span>절차 영상을 보고 뽑기 결과 10회를 스티커 막대그래프로 나타내고 가장 긴 막대를 찾는다 <em>3회기 연속 80% 이상</em></span>${chip('수학 · 정보')}</div>
       <div><b>수학(화폐)</b><span>낸 토큰과 받은 토큰을 쌓아 많은 쪽을 고른다</span>${chip('수학')}</div>
@@ -490,9 +492,9 @@
       <div><b>의사소통</b><span>스크립트 카드를 보고 모둠 결과를 1문장 이상 또래에게 말한다</span>${chip('정보')}</div>
       <div><b>행동(전환)</b><span>1분 전 예고를 받고 2분 안에 다음 스테이션으로 이동한다 <em>5회 중 4회</em></span>${chip('전환')}</div></div>`,
     strength: `<div class="tb-h">강점: 도움만 받는 친구가 아니다</div>
-      <div class="st-chips">${['집중력', '절차 기억', '규칙을 정직하게', '자기만의 관점'].map((t) => `<span>${t}</span>`).join('')}</div>
-      <div class="st-role"><div><b>수학 · 진행자</b>20번의 차례를 세고, 토큰이 캡슐에 다시 들어갔는지 확인한다 → 모둠 데이터가 정확해진다</div>
-        <div><b>정보 · 발표자</b>그래프에서 가장 긴 막대를 찾아 모둠에 알려 준다</div></div>
+      <div class="st-chips"><span class="lbl">관찰 메모</span>${['집중력', '절차 기억', '규칙을 정직하게', '자기만의 관점'].map((t) => `<span class="hw">${t}</span>`).join('')}</div>
+      <div class="st-role"><div class="role-card"><b>진행자</b><i>수학 스테이션</i>20번의 차례를 세고, 토큰이 캡슐에 다시 들어갔는지 확인한다 → 모둠 데이터가 정확해진다</div>
+        <div class="role-card"><b>발표자</b><i>정보 스테이션</i>그래프에서 가장 긴 막대를 찾아 모둠에 알려 준다</div></div>
       <div class="st-say">“A가 20번 모두 다시 넣었는지 확인해서<br>우리 모둠 기록을 믿을 수 있어요”</div>
       <div class="tb-note">자폐성장애의 일반 특성이 아니라, 관찰로 확인한 <b>A 개인의 강점</b>으로 다룬다</div>`,
   };
@@ -509,7 +511,8 @@
     enter(tl, at) { tl.fromTo(this.q('.pf-card'), { y: 60, rotation: 2, opacity: 0 }, { y: 0, rotation: 0.4, opacity: 1, duration: 0.7, ease: 'power3.out' }, at); },
     mode(tl, m, prev, at) { tabMode(this, tl, m, prev, at); },
     after(tl, m, at) {
-      if (m === 'strength') tl.fromTo(this.qa('.st-chips span'), { scale: 0.85, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.35, stagger: 0.1, ease: 'back.out(2)' }, at);
+      if (m === 'strength') { write(tl, this.qa('.st-chips .hw'), at, 0.16); tl.fromTo(this.qa('.role-card'), { y: 14, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, stagger: 0.12 }, at + 0.5); }
+      if (m === 'level') write(tl, this.q('.pn-lv'), at + 0.4);
     },
   });
 
@@ -534,20 +537,20 @@
       g += s.v.map((v, i) => `<circle class="pt" cx="${x(i)}" cy="${y(v)}" r="6" fill="${s.c}"/>`).join('');
       g += `<g class="lb"><line x1="${L + n * 120}" x2="${L + n * 120 + 30}" y1="14" y2="14" stroke="${s.c}" stroke-width="4"/><text x="${L + n * 120 + 38}" y="21" fill="${s.c}">${s.k}</text></g>`;
     });
-    return `<svg class="res" viewBox="0 0 ${W0} ${H0}">${g}</svg>`;
+    return `<svg class="res" viewBox="0 0 ${W0} ${H0}">${g}</svg><div class="fig">그림. 단계별 평균 정반응률 (논문 보고값을 다시 그림)</div>`;
   }
   const PP_BODY = {
     info: `<div class="pp3">
-      <div class="pp-c"><div class="tb-h">대상</div>${li(['중학교 1학년 남학생 1명 (14세)', '자폐성장애 · CARS 35', '특수학급 소속, <b>시간제 통합</b>', '수학 문제해결 백분위 3%'])}
-        <div class="stamp">학생 A와 같은 조건</div></div>
+      <div class="pp-c"><div class="tb-h">대상</div>${li(['중학교 1학년 남학생 1명 (14세)', '<mark>자폐성장애</mark> · CARS 35', '<mark>특수학급 소속, 시간제 통합</mark>', '수학 문제해결 백분위 3%'])}
+        <div class="pn pn-same">↳ 학생 A와 같은 조건!</div></div>
       <div class="pp-c"><div class="tb-h">설계</div><p>행동 간 지연된 중다기초선설계</p>
         <svg class="mb" viewBox="0 0 260 120">${['덧셈', '뺄셈', '곱셈'].map((t, i) => `<text x="0" y="${24 + i * 38}">${t}</text><line x1="56" x2="${92 + i * 50}" y1="${18 + i * 38}" y2="${18 + i * 38}" class="base"/><line x1="${92 + i * 50}" x2="252" y1="${18 + i * 38}" y2="${18 + i * 38}" class="trt"/>`).join('')}</svg>
         <p class="cap">세 행동에 차례로 중재를 시작한다 (구조도)</p></div>
       <div class="pp-c"><div class="tb-h">중재</div>${li(['태블릿 PC <b>비디오 자기 모델링</b> (피드포워드)', '문항: 기본교육과정 <b>화폐의 계산</b> (물건값, 거스름돈)', '영상: 태블릿 내장 카메라 + 기본 편집 프로그램'])}</div></div>`,
-    result: `<div class="pp-res"><div><div class="tb-h">문장제 정반응률 <small>단계별 평균 (논문 보고값)</small></div>${resultSVG()}</div>
-      <div class="pp-big"><div class="big">0% <i>→</i> 96.7%</div><p>기초선에서 유지기까지, 세 행동 모두</p>
+    result: `<div class="pp-res"><div><div class="tb-h">문장제 정반응률</div>${resultSVG()}</div>
+      <div class="pp-big"><div class="big hw">0% → 96.7%</div><p>기초선에서 유지기까지, 세 행동 모두</p>
         <p class="sub">영상을 <b>10개 → 5개 → 0개</b>로 줄여도<br>2주 뒤까지 유지됐다</p>
-        <div class="qual"><span>채점자 간 신뢰도 100%</span><span>중재충실도 94%</span><span>사회적 타당도 63.6점 (기준 52.5)</span></div>
+        <p class="qual">채점자 간 신뢰도 100% · 중재충실도 94% · 사회적 타당도 63.6점(기준 52.5)</p>
         <p class="lim">한계: 대상 1명, 비슷한 문항 반복에 따른 학습 효과</p></div></div>`,
     how: `<div class="tb-h">영상 만들기: 과제분석 → 촉구하며 녹화 → 촉구 장면 삭제</div>
       <div class="flow">
@@ -555,8 +558,8 @@
         <div><b>② 단서에 동그라미</b><span>${chip('보기 · 쓰기')}${chip('국어 독해', 'k')}</span></div>
         <div><b>③ 식 세우기</b><span>${chip('수학', 'm')}</span></div>
         <div><b>④ 계산</b><span>${chip('수학', 'm')}</span></div></div>
-      <p class="flow-note">혼자 해내는 모습만 남긴 약 1분 30초 영상 30개. 아직 못 하는 것을 <b>“해내는 나”</b>로 먼저 본다.<br>
-        <small>우리 분석: 절차 자체가 여러 감각과 교과를 오간다 → 융합수업에 옮기기 자연스럽다</small></p>
+      <p class="flow-note">혼자 해내는 모습만 남긴 약 1분 30초 영상 30개. 아직 못 하는 것을 <mark>“해내는 나”</mark>로 먼저 본다.</p>
+      <div class="pn pn-flow">↳ 우리 분석: 절차 자체가 여러 감각과 교과를 오간다 → 융합수업에 옮기기 자연스럽다</div>
       <div class="tb-h">용암: 영상을 줄여 간다</div>
       <div class="fade">${[[10, '1단계'], [5, '2단계'], [0, '3단계']].map(([n, t]) => `<div><b>${t}</b><span class="film">${Array.from({ length: 10 }, (_, i) => `<i class="${i < n ? 'on' : ''}"></i>`).join('')}</span><em>영상 ${n}개</em></div>`).join('<i class="arr">→</i>')}</div>
       <p class="fade-rule">연속 3회기 평균 80% 이상이면 다음 단계로</p>`,
@@ -586,7 +589,9 @@
         tl.fromTo(this.qa('.res .ln'), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 1.1, stagger: 0.25, ease: 'power1.inOut' }, at);
         tl.fromTo(this.qa('.res .pt, .res .lb'), { opacity: 0 }, { opacity: 1, duration: 0.3, stagger: 0.02 }, at + 0.2);
       }
-      if (m === 'how') tl.fromTo(this.qa('.film i.on'), { opacity: 0 }, { opacity: 1, duration: 0.15, stagger: 0.04 }, at + 0.3);
+      if (m === 'how') { tl.fromTo(this.qa('.film i.on'), { opacity: 0 }, { opacity: 1, duration: 0.15, stagger: 0.04 }, at + 0.3); write(tl, this.qa('.flow .chip'), at + 0.2, 0.08); write(tl, this.q('.pn-flow'), at + 1.0); }
+      if (m === 'info') write(tl, this.q('.pn-same'), at + 0.5);
+      if (m === 'result') write(tl, this.q('.big'), at + 1.0);
     },
   });
 
@@ -596,7 +601,7 @@
     lead: { pic: PAWN.A, who: '학생 A: 수학 스테이션 진행자', what: '태블릿에서 자기 모습이 담긴 절차 영상(5단계)을 이어폰으로 한 번 보고 시작합니다. 20번의 차례를 횟수판에 세고, 토큰이 캡슐에 다시 들어갔는지 확인합니다. 이 규칙이 지켜져야 모둠의 데이터가 정확해집니다', std: '강점으로 기여하는 역할 · 지도안 Ⅷ.1' },
     vocab: { pic: VOCAB_ICON, who: '어려운 말은 쉬운 말로 먼저', what: '"상대도수"는 먼저 <b>전체 중에서 그 색이 나온 비율</b>이라고 말하고, 식(나온 횟수 ÷ 전체 횟수)은 그다음에 보입니다. 카드는 스테이션마다 두고 누구나 봅니다', std: '지도안 Ⅺ.6 핵심 어휘 풀이 카드 · 기초소양(언어)' },
     info: { pic: PAWN.A, who: '학생 A: 정보 스테이션 발표자', what: '논문의 절차를 블록 코드에 옮긴 4단계 영상: <b>소리 내어 읽기 → \'횟수\'에 동그라미하고 버튼 → 가장 긴 막대 찾기 → 스크립트로 말하기</b>. 10번 실행은 영상을 보고, 100번은 필요할 때, 1,000번은 영상 없이 합니다', std: '비디오 자기 모델링 · 용암 · 지도안 Ⅴ.3, 전개 ③' },
-    all: { pic: PAWN.all, who: '모두를 위한 지원', what: '같은 태블릿, 일과표, 역할 카드, 어휘 카드가 처음부터 모든 모둠의 책상에 놓여 있었습니다. 다른 모둠은 교사 시범 영상을, A는 자기 모습 영상을 볼 뿐입니다. 그래서 눈에 띄지 않습니다', more: '같은 설계 위에 지원을 하나 더하면 다른 장애 학생도 함께할 수 있습니다. 예: 시각장애 · 촉각 점 토큰, 청각장애 · 자막 태블릿', std: 'UDL · 통합교육 4대 원리 ② 자연스러운 비가시적 지원' },
+    all: { pic: PAWN.all, who: '모두를 위한 지원', what: '같은 태블릿, 일과표, 역할 카드, 어휘 카드가 처음부터 모든 모둠의 책상에 놓여 있었습니다. 다른 모둠은 교사 시범 영상을, A는 자기 모습 영상을 볼 뿐입니다. 그래서 눈에 띄지 않습니다', std: 'UDL · 통합교육 4대 원리 ② 자연스러운 비가시적 지원' },
   };
   def('note', {
     html: () => `<div><div class="cap-strip rc"><i class="clip"></i><div class="cap-in"></div></div></div>`,
@@ -605,6 +610,48 @@
       const L = NOTE[m];
       swap(tl, this.q('.cap-in'), `<div class="rc-photo${m === 'all' ? ' wide' : ''}">${L.pic}</div>
         <div><div class="who">${L.who}</div><div class="what">${L.what}</div>${L.more ? `<div class="more">${L.more}</div>` : ''}<div class="std">근거 · ${L.std}</div></div>`, at, prev === undefined);
+    },
+  });
+
+  // ── 다른 학생이 오면 (지도안 Ⅺ.1): 같은 책상(흐린 기본 설계) 위에 지원 하나만 더한다 ──
+  const loop = (x, y, w, h) => `<path class="loop" pathLength="1" d="M${x + w * 0.12} ${y + h * 0.1} C ${x + w * 0.4} ${y - h * 0.12}, ${x + w * 1.02} ${y - h * 0.05}, ${x + w} ${y + h * 0.45} C ${x + w * 0.98} ${y + h * 1.05}, ${x + w * 0.2} ${y + h * 1.12}, ${x} ${y + h * 0.6} C ${x - w * 0.02} ${y + h * 0.3}, ${x + w * 0.1} ${y + h * 0.08}, ${x + w * 0.3} ${y + h * 0.02}"/>`;
+  const DESK = `<rect x="10" y="18" width="280" height="114" rx="4" fill="#E6CFA2" stroke="rgba(27,26,24,.35)"/>
+    <g class="base"><rect x="24" y="32" width="76" height="52" rx="5" fill="#2B2A2E"/><rect x="29" y="37" width="66" height="42" fill="#9DB6CF"/>
+    <rect x="114" y="30" width="44" height="60" fill="#FBF8F1" stroke="#8A847A"/>${[42, 54, 66, 78].map((y) => `<rect x="120" y="${y}" width="32" height="4" fill="#8A847A"/>`).join('')}
+    <rect x="170" y="40" width="50" height="32" fill="#EFDDB0" stroke="#8A847A"/>
+    <rect x="232" y="32" width="46" height="36" fill="#FBF8F1" stroke="#213A63"/><rect x="232" y="32" width="46" height="6" fill="#213A63"/><rect x="238" y="44" width="24" height="6" fill="#213A63"/></g>`;
+  const dots = (cx, cy, n) => [...Array(n)].map((_, i) => `<circle cx="${cx + (i - (n - 1) / 2) * 7}" cy="${cy}" r="2.4" fill="#1B1A18"/>`).join('');
+  const EXT = [
+    ['시각장애', '캡슐 속 토큰에 촉각 점 (금 1 · 은 2 · 동 3)',
+      `<g class="add">${[['#E2B43E', 1, 150], ['#C9CED4', 2, 194], ['#C08A5A', 3, 238]].map(([c, n, x]) => `<circle cx="${x}" cy="108" r="15" fill="${c}" stroke="rgba(27,26,24,.4)"/>${dots(x, 108, n)}`).join('')}</g>${loop(126, 88, 138, 40)}`],
+    ['청각장애', '자막이 나오는 태블릿 · 소리 대신 빛 타이머',
+      `<g class="add"><rect x="31" y="66" width="62" height="10" fill="#FBF8F1"/><rect x="35" y="69" width="40" height="4" fill="#1B1A18"/>
+        <circle cx="236" cy="104" r="15" fill="#F6D04D" stroke="#C99A1E" stroke-width="2"/>${[0, 60, 120, 180, 240, 300].map((a) => { const r = a * Math.PI / 180; return `<line x1="${236 + Math.cos(r) * 19}" y1="${104 + Math.sin(r) * 19}" x2="${236 + Math.cos(r) * 25}" y2="${104 + Math.sin(r) * 25}" stroke="#C99A1E" stroke-width="2.4" stroke-linecap="round"/>`; }).join('')}</g>
+        ${loop(20, 58, 84, 26)}${loop(206, 76, 60, 56)}`],
+    ['지체장애', '휠체어가 지나는 넓힌 동선 · 큰 버튼 대체 입력',
+      `<g class="add"><circle cx="150" cy="108" r="16" fill="#C8553D" stroke="#8E3424" stroke-width="3"/>
+        <path d="M14 144 H286 M14 144 l9 -5 M14 144 l9 5 M286 144 l-9 -5 M286 144 l-9 5" stroke="#1B1A18" stroke-width="2.4" fill="none" stroke-linecap="round"/></g>
+        ${loop(126, 86, 48, 44)}`],
+    ['한국어를 배우는 학생', '핵심 어휘 이중언어 카드',
+      `<g class="add"><rect x="232" y="78" width="46" height="40" fill="#FBF8F1" stroke="#213A63"/><rect x="238" y="86" width="26" height="6" fill="#213A63"/><rect x="238" y="98" width="32" height="5" fill="#2F7F7A"/><rect x="238" y="108" width="22" height="5" fill="#2F7F7A"/></g>
+        ${loop(222, 70, 66, 56)}`],
+  ];
+  def('ext', {
+    html: () => `<div><div class="sheet ws-ext">
+      <div class="sh-top"><span>지도안 Ⅺ.1</span><span>UDL · 같은 설계 위에 더하기</span></div>
+      <h3>다른 학생이 오면</h3>
+      <div class="sh-sub">흐린 것은 이미 모든 책상에 있는 기본 설계, 진한 것이 더한 지원</div>
+      <div class="ex-grid">${EXT.map(([k, d, add]) => `<div class="ex-card"><svg class="desk" viewBox="0 0 300 152">${DESK}${add}</svg><b>${k}</b><span>${d}</span></div>`).join('')}</div>
+      <div class="pn pn-ext">↳ 활동과 목표는 그대로, 책상 위에 하나만 더한다</div></div></div>`,
+    enter(tl, at) {
+      tl.fromTo(this.q('.sheet'), { x: 50, rotation: 2, opacity: 0 }, { x: 0, rotation: 0.4, opacity: 1, duration: 0.7, ease: 'power3.out' }, at);
+      tl.fromTo(this.qa('.ex-card'), { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.4, stagger: 0.1 }, at + 0.4);
+      this.qa('.ex-card').forEach((c, i) => {
+        const t = at + 1.0 + i * 0.45;
+        tl.fromTo(D.$$('.add', c), { opacity: 0, scale: 0.6, transformOrigin: '50% 50%' }, { opacity: 1, scale: 1, duration: 0.35, ease: 'back.out(2)' }, t);
+        tl.fromTo(D.$$('.loop', c), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.5, ease: 'power1.inOut' }, t + 0.25);
+      });
+      write(tl, this.q('.pn-ext'), at + 3.0);
     },
   });
 

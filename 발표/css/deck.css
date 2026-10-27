@@ -444,25 +444,35 @@ html.nogl #pins { display: none; }
 /* ══════════════════════════════════════════════
    학생 A · 연구 노트 · 역량: 교사가 수업을 준비하며 쓰는 종이들
    ══════════════════════════════════════════════ */
-.chip { display: inline-block; font-style: normal; font-size: 19px; font-weight: 700; color: var(--navy); background: var(--navy-tint); padding: 3px 10px; border-radius: 4px; white-space: nowrap; }
-.chip.k { color: #6B4A12; background: #F4E6C4; }
-.chip.m { color: #fff; background: var(--navy); }
+.chip { display: inline-block; font-style: normal; font-family: var(--hand); font-size: 25px; font-weight: 700; line-height: 1; color: var(--pencil); padding: 4px 10px 2px; white-space: nowrap;
+  border: 2px solid rgba(60,58,64,.75); border-radius: 255px 18px 225px 18px / 18px 225px 18px 255px; }   /* 교사가 여백에 연필로 두른 동그라미 */
+/* 형광펜: 지도안 패널의 형광펜과 같은 색 */
+.ov mark { color: inherit; background: linear-gradient(97deg, rgba(255,214,84,0) 0, rgba(255,214,84,.5) 4px, rgba(255,210,74,.44) calc(100% - 5px), rgba(255,214,84,0) 100%); padding: 0 2px; }
+.ov .bul mark, .ov dd mark { font-weight: 700; }
+/* 여백의 연필 메모 */
+.pn { font-family: var(--hand); font-weight: 700; color: var(--pencil); font-size: 29px; line-height: 1.25; transform: rotate(-1.5deg); transform-origin: left center; }
 .bul { margin: 0; padding: 0; list-style: none; }
 .bul li { position: relative; padding: 6px 0 6px 22px; font-size: 24px; line-height: 1.4; }
 .bul li::before { content: ""; position: absolute; left: 2px; top: 19px; width: 8px; height: 8px; background: var(--navy); }
-.bul b { color: var(--navy); }
+.bul b { color: var(--ink); }
 .tb-h { font-family: var(--serif); font-weight: 900; font-size: 27px; color: var(--ink); margin: 4px 0 10px; }
 .tb-h small { font-family: var(--sans); font-size: 19px; font-weight: 700; color: var(--ink-3); margin-left: 10px; }
 .tb-note { margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--hair); font-size: 21px; color: var(--ink-2); line-height: 1.45; }
 .tb-note b { color: var(--ink); }
 
-/* 탭: 종이 위쪽의 견출지. 지금 설명하는 곳이 남색으로 */
-.tabs { display: flex; gap: 6px; margin: 18px 0 16px; border-bottom: 2px solid var(--ink); }
-.tabs span { font-size: 21px; font-weight: 700; color: var(--ink-3); padding: 8px 18px 6px; background: rgba(27,26,24,.05); border-radius: 6px 6px 0 0; transition: background .3s, color .3s; }
-.tabs span.on { background: var(--navy); color: #fff; }
+/* 견출지 인덱스 탭: 종이 오른쪽 가장자리에 붙어 있고(Bruner 목표 탭과 같은 물건), 지금 펼친 곳이 앞으로 나온다 */
+.tabs { position: absolute; left: 100%; top: 170px; display: flex; flex-direction: column; gap: 10px; }
+.tabs span { display: block; width: 150px; word-break: keep-all; font-family: var(--serif); font-size: 21px; font-weight: 900; color: rgba(27,26,24,.55); padding: 14px 10px 14px 16px;
+  border-radius: 0 12px 12px 0; box-shadow: 3px 4px 8px rgba(40,30,10,.16); transform: translateX(-14px); transition: transform .35s, color .3s, box-shadow .3s; }
+.tabs span:nth-child(1) { background: #CFE2C2; }
+.tabs span:nth-child(2) { background: #C3D6EC; }
+.tabs span:nth-child(3) { background: #F1E2BC; }
+.tabs span:nth-child(4) { background: #E9CFC6; }
+.tabs span.on { transform: translateX(0); color: var(--ink); box-shadow: 4px 6px 12px rgba(40,30,10,.26); }
+.tab-body { margin-top: 18px; padding-top: 14px; border-top: 2px solid var(--ink); }
 
 /* 학생 기록 카드 */
-.pf-card { right: 44px; top: 50px; width: 740px; padding: 18px 32px 26px; }
+.pf-card { right: 168px; top: 50px; width: 730px; padding: 18px 32px 26px; }
 .pf-card .rc-main { grid-template-columns: 120px 1fr; }
 .pf-card .rc-photo { width: 120px; height: 146px; }
 .pf-card .nm span small { font-size: 21px; font-weight: 500; color: var(--ink-2); margin-left: 4px; }
@@ -471,71 +481,83 @@ html.nogl #pins { display: none; }
 dl.lv { margin: 0; display: grid; grid-template-columns: 112px 1fr; gap: 8px 14px; font-size: 22px; line-height: 1.42; }
 dl.lv dt { font-weight: 700; color: var(--ink-3); font-size: 21px; padding-top: 2px; }
 dl.lv dd { margin: 0; }
-dl.lv .key { background: #FFF3C7; margin: 0 -8px; padding: 6px 8px; }
-dl.lv dt.key { color: var(--ink); margin-right: 0; }
-dl.lv dd.key { margin-left: -14px; padding-left: 14px; }
+.pn-lv { margin: 10px 0 0 124px; }
 .iep > div { display: grid; grid-template-columns: 150px 1fr auto; gap: 14px; align-items: start; padding: 10px 0; border-top: 1px solid var(--hair); font-size: 21px; line-height: 1.42; }
 .iep > div:first-child { border-top: 0; }
-.iep b { font-size: 21px; color: var(--navy); }
+.iep b { font-size: 21px; color: var(--ink); font-family: var(--serif); }
 .iep em { font-style: normal; font-size: 18px; font-weight: 700; color: var(--ink-3); white-space: nowrap; }
-.st-chips { display: flex; flex-wrap: wrap; gap: 10px; margin: 2px 0 16px; }
-.st-chips span { font-family: var(--serif); font-weight: 900; font-size: 30px; color: #6B4A12; background: #F7E9C6; border: 2px solid #E2C27A; padding: 6px 18px; border-radius: 40px; }
-.st-role { display: grid; gap: 10px; }
-.st-role div { font-size: 22px; line-height: 1.45; padding: 10px 14px; background: var(--navy-tint); border-left: 6px solid var(--navy); }
-.st-role b { display: block; color: var(--navy); font-size: 22px; }
+/* 강점: 교사의 관찰 메모(연필), 역할은 3D 책상 위 역할 카드와 같은 종이 */
+.st-chips { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 22px; margin: 2px 0 18px; }
+.st-chips .lbl { font-size: 19px; font-weight: 700; color: var(--ink-3); }
+.st-chips .hw { font-size: 38px; line-height: 1.1; border-bottom: 2px solid rgba(60,58,64,.6); }
+.st-role { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.role-card { position: relative; font-size: 21px; line-height: 1.42; padding: 14px 16px 16px; background: #EFDDB0; border: 1px solid rgba(27,26,24,.22);
+  box-shadow: 0 6px 12px rgba(40,30,10,.16); }
+.role-card:nth-child(1) { transform: rotate(-1deg); }
+.role-card:nth-child(2) { transform: rotate(0.8deg); }
+.role-card b { display: block; font-family: var(--serif); font-size: 28px; font-weight: 900; }
+.role-card i { display: block; font-style: normal; font-size: 18px; font-weight: 700; color: var(--ink-2); margin-bottom: 6px; }
 .st-say { font-family: var(--hand); font-size: 30px; color: var(--pencil); margin: 14px 0 0; line-height: 1.25; }
 
 /* 역량 */
-.ws-comp { right: 48px; top: 50px; width: 700px; padding: 26px 34px 26px; }
+.ws-comp { right: 48px; top: 50px; width: 720px; padding: 26px 34px 26px; }
+/* 다른 학생이 오면: 위에서 본 같은 책상 네 장. 흐린 것은 기본 설계, 진한 것과 연필 동그라미가 더한 지원 */
+.ws-ext { right: 48px; top: 50px; width: 780px; padding: 26px 34px 24px; }
+.ex-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px; }
+.ex-card svg.desk { width: 100%; height: auto; display: block; overflow: visible; }
+.desk .base { opacity: .4; }
+.desk .loop { fill: none; stroke: var(--pencil); stroke-width: 2.4; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; }
+.ex-card b { display: block; font-family: var(--serif); font-size: 25px; margin-top: 4px; }
+.ex-card span { display: block; font-size: 19px; line-height: 1.35; color: var(--ink-2); }
+.pn-ext { margin-top: 16px; }
 .cp-grp { margin: 16px 0 4px; font-size: 20px; font-weight: 700; color: var(--ink-3); letter-spacing: .04em; }
 .cp-row { display: grid; grid-template-columns: 150px 1fr auto; gap: 14px; align-items: center; padding: 9px 0; border-top: 1px solid var(--hair); font-size: 21px; line-height: 1.4; }
-.cp-row b { font-family: var(--serif); font-size: 24px; color: var(--navy); }
+.cp-row b { font-family: var(--serif); font-size: 24px; color: var(--ink); }
 .cp-subj { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-.cp-subj div { background: rgba(27,26,24,.05); padding: 10px 14px; font-size: 20px; line-height: 1.35; }
+.cp-subj div { border: 1px solid rgba(27,26,24,.3); padding: 10px 14px; font-size: 20px; line-height: 1.35; }
 .cp-subj b { display: block; font-family: var(--serif); font-size: 24px; color: var(--ink); }
 .cp-foot { margin-top: 14px; padding-top: 12px; border-top: 2px solid var(--ink); display: grid; gap: 8px; font-size: 21px; }
-.cp-foot b { color: var(--navy); margin-right: 8px; }
-.cp-a { background: #FFF3C7; padding: 6px 10px; }
+.cp-foot b { color: var(--ink); margin-right: 8px; }
 
 /* 연구 노트 */
-.ws-paper { left: 56px; right: 56px; top: 44px; padding: 24px 40px 28px; }
+.ws-paper { left: 40px; right: 168px; top: 44px; padding: 24px 40px 28px; }
 .ws-paper h3 { font-size: 31px; line-height: 1.3; margin-top: 12px; }
 .ws-paper .tab-body { min-height: 560px; }
 .pp3 { display: grid; grid-template-columns: 1.05fr 1fr 1fr; gap: 26px; }
 .pp-c { position: relative; }
 .pp-c p { font-size: 23px; line-height: 1.4; margin: 0 0 8px; }
 .pp-c p.cap { font-size: 19px; color: var(--ink-3); }
-.stamp { display: inline-block; margin-top: 16px; font-family: var(--serif); font-weight: 900; font-size: 25px; color: #B3402E; border: 3px solid #B3402E; padding: 4px 14px; transform: rotate(-4deg); }
+.pn-same { margin-top: 14px; }
 svg.mb { width: 100%; height: auto; }
 svg.mb text { font-size: 17px; font-weight: 700; fill: var(--ink-2); }
 svg.mb .base { stroke: #B9B2A6; stroke-width: 6; }
 svg.mb .trt { stroke: var(--navy); stroke-width: 6; }
-.pp-res { display: grid; grid-template-columns: 610px 1fr; gap: 26px; align-items: start; }
-svg.res { width: 600px; height: auto; display: block; }
+.pp-res { display: grid; grid-template-columns: 570px 1fr; gap: 26px; align-items: start; }
+svg.res { width: 560px; height: auto; display: block; }
+.fig { font-family: var(--serif); font-size: 18px; color: var(--ink-2); margin-top: 4px; }
 svg.res .grid { stroke: rgba(27,26,24,.14); stroke-width: 1; }
 svg.res .ph { stroke: var(--ink-3); stroke-width: 2; stroke-dasharray: 6 5; }
 svg.res .ax { font-size: 19px; fill: var(--ink-2); font-weight: 500; }
 svg.res .ln { fill: none; stroke-width: 3.5; stroke-linejoin: round; stroke-dasharray: 1; }
 svg.res .lb { font-size: 21px; font-weight: 900; }
-.pp-big .big { font-family: var(--serif); font-weight: 900; font-size: 58px; line-height: 1; color: var(--navy); margin-top: 30px; white-space: nowrap; }
-.pp-big .big i { font-style: normal; color: var(--ink-3); font-size: 44px; }
+.pp-big .big { font-size: 64px; line-height: 1; margin-top: 34px; white-space: nowrap; transform: rotate(-2deg); transform-origin: left center; }
 .pp-big p { font-size: 23px; margin: 10px 0 0; line-height: 1.4; }
 .pp-big p.sub { font-size: 25px; margin-top: 22px; }
-.pp-big p.sub b { color: var(--navy); }
-.qual { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
-.qual span { font-size: 19px; font-weight: 700; color: var(--ink-2); background: rgba(27,26,24,.06); padding: 4px 10px; }
+.pp-big p.sub b { color: var(--ink); }
+.pp-big p.qual { font-size: 19px; color: var(--ink-2); margin-top: 22px; padding-top: 10px; border-top: 1px solid var(--hair); }
 .pp-big p.lim { font-size: 19px; color: var(--ink-3); margin-top: 16px; }
 .flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; counter-reset: f; }
-.flow > div { position: relative; padding: 14px 18px 14px 18px; background: var(--navy-tint); margin-right: 22px; min-height: 104px; }
+.flow > div { position: relative; word-break: keep-all; padding: 30px 16px 14px; background: #fff; border: 2px solid var(--ink); margin-right: 26px; min-height: 120px; }   /* 영상 콘티 한 칸 */
+.flow > div::before { content: "장면 " counter(f); counter-increment: f; position: absolute; left: 0; top: 0; font-size: 16px; font-weight: 700; color: #fff; background: var(--ink); padding: 1px 8px; }
 .flow > div:not(:last-child)::after { content: "→"; position: absolute; right: -24px; top: 30px; font-size: 26px; color: var(--ink-3); }
 .flow b { display: block; font-size: 23px; margin-bottom: 10px; }
 .flow span { display: flex; flex-wrap: wrap; gap: 6px; }
-.flow-note { font-size: 22px; line-height: 1.5; margin: 14px 0 22px; }
-.flow-note small { display: block; font-size: 20px; color: #6B4A12; background: #FFF3C7; padding: 4px 10px; margin-top: 8px; }
+.flow-note { font-size: 22px; line-height: 1.5; margin: 14px 0 4px; }
+.pn-flow { font-size: 26px; margin: 8px 0 20px; transform: rotate(-.5deg); }
 .fade { display: flex; align-items: center; gap: 18px; }
 .fade > div { display: grid; gap: 6px; }
 .fade b { font-size: 21px; }
-.fade em { font-style: normal; font-size: 21px; font-weight: 700; color: var(--navy); }
+.fade em { font-style: normal; font-size: 21px; font-weight: 700; color: var(--ink); }
 .film { display: flex; gap: 4px; padding: 6px; background: #2C2F36; border-radius: 3px; }
 .film i { width: 18px; height: 24px; background: rgba(255,255,255,.12); border-radius: 2px; }
 .film i.on { background: #F3D37C; }
@@ -545,10 +567,11 @@ svg.res .lb { font-size: 21px; font-weight: 900; }
 .why { display: grid; gap: 0; }
 .why div { font-size: 21px; line-height: 1.4; padding: 8px 0; border-top: 1px solid var(--hair); }
 .why div:first-child { border-top: 0; }
-.why b { display: block; font-family: var(--serif); font-size: 23px; color: var(--navy); }
+.why b { display: block; font-family: var(--serif); font-size: 23px; color: var(--ink); }
 .steps5 { margin: 0; padding-left: 0; list-style: none; counter-reset: s; }
 .steps5 li { counter-increment: s; position: relative; padding: 8px 0 8px 50px; font-size: 23px; border-top: 1px solid var(--hair); }
-.steps5 li::before { content: counter(s); position: absolute; left: 0; top: 6px; width: 36px; height: 36px; border-radius: 50%; background: var(--navy); color: #fff; font-weight: 900; font-size: 21px; display: grid; place-items: center; }
-.now { margin-top: 18px; font-size: 21px; line-height: 1.45; padding: 12px 16px; background: #FFF3C7; border-left: 6px solid var(--gold); }
-.now b { display: block; font-size: 23px; }
-.now.info { margin-top: 10px; border-left-color: var(--navy); background: var(--navy-tint); }
+.steps5 li::before { content: counter(s); position: absolute; left: 0; top: 6px; width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--ink); color: var(--ink); font-family: var(--serif); font-weight: 900; font-size: 20px; display: grid; place-items: center; }
+/* 포스트잇 */
+.now { margin-top: 18px; font-size: 21px; line-height: 1.45; padding: 14px 18px 16px; background: #FFF0A6; box-shadow: 0 8px 14px rgba(40,30,10,.18); transform: rotate(-1deg); }
+.now b { display: block; font-family: var(--hand); font-size: 30px; color: var(--pencil); line-height: 1.1; margin-bottom: 4px; }
+.now.info { margin-top: 14px; background: #CFE6F2; transform: rotate(0.8deg); }
