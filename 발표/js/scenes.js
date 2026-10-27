@@ -42,6 +42,8 @@
     { scene: 's3', label: '현행수준', set: { overlay: 'profile:level', doc: [tr('100 이하의 수를 세고'), tr('시범을 직접 보거나')] } },
     { scene: 's3', label: 'IEP 목표', set: { overlay: 'profile:iep', doc: [tr('절차 영상을 보고 뽑기 결과 10회'), tr('스크립트 카드를 보고 모둠 결과를')] } },
     { scene: 's3', label: '강점: 도움만 받는 친구가 아니다', set: { overlay: 'profile:strength', doc: [{ sel: 'li', text: '또래의 시선' }] } },
+    { scene: 's3', label: 'A의 45분: 개별 일과표 = 수업 흐름', set: { overlay: 'profile:day',
+        doc: [{ sel: 'li', text: '학생 A는 수학 스테이션에서 시작하는 3모둠' }, { sel: 'li', text: '전환은 교실 TV' }] } },
 
     // s4 관련 논문 분석 → 교수 방법
     { scene: 's4', label: '논문: 대상과 설계', set: { overlay: 'paper:info', pins: [], speaker: SPEAKERS.정보, doc: [sec('h3', '1. 분석 논문')] } },
@@ -71,7 +73,9 @@
     // s7 통합교육 장치
     { scene: 's7', label: '교실 전체 · 개별 지원은 A 한 명, T4는 수학 공동 교수', set: { overlay: null, cam: 'room', pins: ['t4'], speaker: SPEAKERS.특수,
         doc: [{ col: '개별 지원', strong: 'A' }] } },
-    { scene: 's7', label: '모두를 위한 지원', set: { lens: 'all', pins: [], overlay: 'note:all',
+    { scene: 's7', label: '개별화 평가: 단계별 수행 기록 → 용암 시점', set: { overlay: 'rec', cam: 'roomL', pins: [],
+        doc: [{ sel: 'tr', first: '모두(학생 A)' }, { sel: 'li', text: '개별화 평가(기준표는 T4가 준비)' }] } },
+    { scene: 's7', label: '모두를 위한 지원', set: { lens: 'all', pins: [], overlay: 'note:all', cam: 'room',
         doc: [{ sel: 'p', text: '모두에게 주는 기본 설계' }] } },
     { scene: 's7', label: '다른 학생이 오면: 같은 책상에 하나만 더한다', set: { overlay: 'ext', cam: 'roomL',
         doc: [{ sel: 'p', text: '같은 설계 위에 지원을 더하면' }] } },
@@ -90,5 +94,5 @@
   ];
 
   // 장면별 목표 시간 (발표_시나리오.md 표와 같다, 초 단위로 장면이 끝나야 하는 시각)
-  D.SCENE_END = { s1: 45, s2: 135, s3: 220, s4: 310, s5: 395, s6: 465, s7: 525, s8: 585, s9: 600 };
+  D.SCENE_END = { s1: 45, s2: 135, s3: 245, s4: 335, s5: 420, s6: 490, s7: 580, s8: 645, s9: 665 };
 })();

@@ -497,6 +497,17 @@
         <div class="role-card"><b>발표자</b><i>정보 스테이션</i>그래프에서 가장 긴 막대를 찾아 모둠에 알려 준다</div></div>
       <div class="st-say">“A가 20번 모두 다시 넣었는지 확인해서<br>우리 모둠 기록을 믿을 수 있어요”</div>
       <div class="tb-note">자폐성장애의 일반 특성이 아니라, 관찰로 확인한 <b>A 개인의 강점</b>으로 다룬다</div>`,
+    day: `<div class="tb-h">A의 45분 <small>개별 일과표 카드 · 3모둠</small></div><div class="sched">
+      ${[['', '도입', 5, '전체 · T1', 'O·X 카드로 예측 · 일과표 확인 · 헤드폰은 스스로 고른다'],
+        ['m', '수학', 10, 'T2 · T4', '<b>진행자</b> · 자기 모습 절차 영상. 연습한 절차와 익숙한 T4로 시작한다'],
+        ['-', '1분 전: TV 타이머 색이 바뀌고, 일과표 카드로 한 번 더 예고 · 짝과 이동'],
+        ['i', '정보', 10, 'T3', '<b>발표자</b> · 4단계 절차 영상 · 스크립트 카드'],
+        ['-', '전환 (위와 같음)'],
+        ['s', '사회', 10, 'T1', '절차 영상(3단계) · 그림 카드 두 장 중 하나를 고르고 이유 말하기'],
+        ['', '정리', 7, 'T1 · T2', '스티커 투표 · 발표 스크립트 카드']].map((r) => r[0] === '-'
+        ? `<div class="sc-tr">${r[1]}</div>`
+        : `<div class="sc-row ${r[0]}"><span class="sc-ck">✓</span><b>${r[1]}</b><em>${r[2]}′</em><i>${r[3]}</i><span>${r[4]}</span></div>`).join('')}</div>
+      <div class="pn pn-day">↳ 힘들면 휴식 카드 → 쉼 자리 3분 (누구나 쓴다)</div>`,
   };
   def('profile', {
     html: () => `<div><div class="rc pf-card"><i class="clip"></i>
@@ -506,13 +517,14 @@
           <dl><dt>학년·성별</dt><dd>중학교 2학년 · 남학생 (만 14세)</dd>
             <dt>배치</dt><dd>특수학급 소속 · 이 시간 통합학급으로 시간제 통합</dd>
             <dt>검사</dt><dd>K-WISC-V 62 · CARS-2 35 · KISE-BAAT(수학) 68</dd></dl></div></div>
-      ${tabs([['who', '특성'], ['level', '현행수준'], ['iep', 'IEP 목표'], ['strength', '강점']])}
+      ${tabs([['who', '특성'], ['level', '현행수준'], ['iep', 'IEP 목표'], ['strength', '강점'], ['day', 'A의 45분']])}
       ${panes(PF_BODY)}</div></div>`,
     enter(tl, at) { tl.fromTo(this.q('.pf-card'), { y: 60, rotation: 2, opacity: 0 }, { y: 0, rotation: 0.4, opacity: 1, duration: 0.7, ease: 'power3.out' }, at); },
     mode(tl, m, prev, at) { tabMode(this, tl, m, prev, at); },
     after(tl, m, at) {
       if (m === 'strength') { write(tl, this.qa('.st-chips .hw'), at, 0.16); tl.fromTo(this.qa('.role-card'), { y: 14, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, stagger: 0.12 }, at + 0.5); }
       if (m === 'level') write(tl, this.q('.pn-lv'), at + 0.4);
+      if (m === 'day') { write(tl, this.qa('.sc-ck'), at + 0.4, 0.22); write(tl, this.q('.pn-day'), at + 1.9); }
     },
   });
 
@@ -610,6 +622,29 @@
       const L = NOTE[m];
       swap(tl, this.q('.cap-in'), `<div class="rc-photo${m === 'all' ? ' wide' : ''}">${L.pic}</div>
         <div><div class="who">${L.who}</div><div class="what">${L.what}</div>${L.more ? `<div class="more">${L.more}</div>` : ''}<div class="std">근거 · ${L.std}</div></div>`, at, prev === undefined);
+    },
+  });
+
+  // ── 개별화 평가 (지도안 Ⅹ.1): 과제분석 단계마다 촉구 수준을 적고, 독립 수행률로 용암 시점을 정한다 ──
+  const REC_STEPS = ['통에서 캡슐 1개 뽑기', '캡슐 열어 토큰 색 보기', '같은 색 칸에 스티커 붙이기', '토큰을 넣어 닫고 통에 돌려놓기', '통을 짝에게 넘기기'];
+  const REC = ['시독시언독', '독독언독독', '독독독언독', '독독독독독'];   // 회기별 예시 기록
+  const pct = (r) => Math.round([...r].filter((c) => c === '독').length / r.length * 100);
+  def('rec', {
+    html: () => `<div><div class="sheet ws-rec">
+      <div class="sh-top"><span>지도안 Ⅹ.1 개별화 평가 · 기록 T4</span><span class="hw">예시</span></div>
+      <h3>학생 A 단계별 수행 기록</h3>
+      <div class="sh-sub">수학 스테이션 과제분석 5단계 · 정보 스테이션 발표는 T3가 같은 방식으로 기록</div>
+      <table class="rec"><thead><tr><th>단계</th>${REC.map((_, i) => `<th>${i + 1}회기</th>`).join('')}</tr></thead><tbody>
+        ${REC_STEPS.map((t, j) => `<tr><td><b>${j + 1}</b>${t}</td>${REC.map((r) => `<td><span class="hw cd${r[j] === '독' ? '' : ' p'}">${r[j]}</span></td>`).join('')}</tr>`).join('')}
+        <tr class="sum"><td>독립 수행률</td>${REC.map((r, i) => `<td><span class="hw">${pct(r)}%</span>${i === 1 ? `<svg class="pencil rec-loop" viewBox="0 0 200 70" preserveAspectRatio="none"><path pathLength="1" d="M26 18 C 60 4, 176 4, 190 28 C 202 50, 128 66, 54 62 C 12 59, 4 40, 18 26 C 26 18, 44 12, 62 10"/></svg>` : ''}</td>`).join('')}</tr></tbody></table>
+      <div class="rec-key">독 독립 · 언 언어 촉구 · 시 시범 · 신 신체 촉구</div>
+      <div class="pn pn-rec">↳ 연속 3회기 80% 이상 → 다음 용암 단계 (영상을 줄인다)</div>
+      <div class="rec-adj"><b>평가 조정</b> 말하기 · 가리키기 · 스티커로 답한다 · 문항을 읽어 준다 · 시간 연장 · 기본교육과정 연계 목표로 평가해 IEP 진전에 반영</div></div></div>`,
+    enter(tl, at) {
+      tl.fromTo(this.q('.sheet'), { x: 50, rotation: 2, opacity: 0 }, { x: 0, rotation: 0.4, opacity: 1, duration: 0.7, ease: 'power3.out' }, at);
+      REC.forEach((_, i) => write(tl, this.qa(`.rec tbody tr:not(.sum) td:nth-child(${i + 2}) .hw, .rec tr.sum td:nth-child(${i + 2}) .hw`), at + 0.7 + i * 0.6, 0.06));
+      tl.fromTo(this.q('.rec-loop path'), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.6, ease: 'power1.inOut' }, at + 3.3);
+      write(tl, this.q('.pn-rec'), at + 3.7);
     },
   });
 

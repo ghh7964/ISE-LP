@@ -502,6 +502,35 @@ dl.lv dd { margin: 0; }
 /* 역량 */
 .ws-comp { right: 48px; top: 50px; width: 720px; padding: 26px 34px 26px; }
 /* 다른 학생이 오면: 위에서 본 같은 책상 네 장. 흐린 것은 기본 설계, 진한 것과 연필 동그라미가 더한 지원 */
+/* A의 45분: 벨크로 그림 카드를 세로로 붙인 개별 일과표. 스테이션 색은 견출지 탭과 같다 */
+.sched { display: grid; gap: 6px; }
+.sc-row { display: grid; grid-template-columns: 34px 62px 44px 82px 1fr; align-items: center; gap: 8px; padding: 9px 12px; font-size: 19px; line-height: 1.3;
+  background: #F6F1E6; border: 1px solid rgba(27,26,24,.22); box-shadow: 0 2px 4px rgba(40,30,10,.08); }
+.sc-row.m { background: #DCEAD2; } .sc-row.i { background: #D3E1F0; } .sc-row.s { background: #F3E7C8; }
+.sc-row b { font-family: var(--serif); font-size: 23px; }
+.sc-row em { font-style: normal; font-weight: 700; color: var(--ink-2); }
+.sc-row i { font-style: normal; font-size: 17px; font-weight: 700; color: var(--ink-3); }
+.sc-ck { font-family: var(--hand); font-size: 30px; font-weight: 700; color: var(--pencil); line-height: 1; text-align: center; }
+.sc-tr { font-size: 17px; color: var(--ink-3); padding: 0 0 0 46px; border-left: 2px dashed rgba(27,26,24,.25); margin-left: 16px; }
+.pn-day { margin-top: 12px; font-size: 26px; }
+/* 개별화 평가 기록지 */
+.ws-rec { right: 48px; top: 50px; width: 780px; padding: 26px 34px 24px; }
+.ws-rec .sh-top .hw { font-size: 26px; }
+table.rec { width: 100%; border-collapse: collapse; font-size: 19px; margin-top: 4px; }
+table.rec th { font-size: 17px; color: var(--ink-3); font-weight: 700; padding: 4px 6px; border-bottom: 2px solid var(--ink); width: 13%; }
+table.rec th:first-child { text-align: left; width: auto; }
+table.rec td { border-bottom: 1px solid var(--hair); padding: 7px 6px; text-align: center; position: relative; }
+table.rec td:first-child { text-align: left; }
+table.rec td:first-child b { display: inline-block; width: 26px; font-family: var(--serif); }
+table.rec .cd { font-size: 28px; line-height: 1; }
+table.rec .cd.p { color: #9A6B3A; }
+table.rec tr.sum td { border-bottom: none; padding-top: 10px; font-weight: 700; }
+table.rec tr.sum .hw { font-size: 28px; }
+.rec-loop { left: -8px; top: -2px; width: calc(300% + 16px); height: calc(100% + 4px); }
+.rec-key { font-size: 17px; color: var(--ink-3); margin-top: 8px; }
+.pn-rec { margin-top: 10px; font-size: 27px; }
+.rec-adj { margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--hair); font-size: 19px; line-height: 1.45; color: var(--ink-2); }
+.rec-adj b { color: var(--ink); margin-right: 8px; }
 .ws-ext { right: 48px; top: 50px; width: 780px; padding: 26px 34px 24px; }
 .ex-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px; }
 .ex-card svg.desk { width: 100%; height: auto; display: block; overflow: visible; }
