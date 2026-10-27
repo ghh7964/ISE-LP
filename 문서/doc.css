@@ -1,0 +1,99 @@
+/* 수업지도안 A4 조판. 화면에서는 종이 묶음으로 보이고, 인쇄하면 @page 규칙대로 쪽이 나뉜다. */
+:root {
+  --ink: #1B1A18; --ink-2: #4A4842; --ink-3: #7C786F;
+  --navy: #1F3864; --navy-2: #2E4A75;
+  --line: #B8C0CC; --hair: #D9DEE5; --head: #E8EDF4; --tint: #F4F6F9; --hi: #FFF4D6;
+  --desk: #E7E3DA;
+  --sans: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --serif: "Noto Serif KR", "AppleMyungjo", serif;
+}
+
+/* ── 쪽 ─────────────────────────────── */
+@page {
+  size: A4; margin: 19mm 17mm 17mm;
+  @top-right { content: "특수교육론 1조 · 수업지도안(세안) · 뽑기, 정말 이득일까?"; font-family: "Noto Sans KR", sans-serif; font-size: 7.5pt; color: #8A96A8; vertical-align: bottom; padding-bottom: 4mm; }
+  @bottom-center { content: counter(page) " / " counter(pages); font-family: "Noto Sans KR", sans-serif; font-size: 8pt; color: #8A96A8; vertical-align: top; padding-top: 4mm; }
+}
+@page :first { @top-right { content: none; } }
+@page wide {
+  size: A4 landscape; margin: 14mm 13mm 13mm;
+  @top-right { content: "특수교육론 1조 · 수업지도안(세안) · Ⅷ.2 과정안"; font-family: "Noto Sans KR", sans-serif; font-size: 7.5pt; color: #8A96A8; vertical-align: bottom; padding-bottom: 3mm; }
+  @bottom-center { content: counter(page) " / " counter(pages); font-family: "Noto Sans KR", sans-serif; font-size: 8pt; color: #8A96A8; vertical-align: top; padding-top: 3mm; }
+}
+
+* { box-sizing: border-box; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { margin: 0; background: var(--desk); color: var(--ink); font: 400 9.6pt/1.66 var(--sans); word-break: keep-all; overflow-wrap: anywhere; }
+
+/* 화면: 종이 묶음 */
+.bar { position: sticky; top: 0; z-index: 5; display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  padding: 10px 16px; background: rgba(231,227,218,.92); backdrop-filter: blur(6px); font-size: 13px; color: var(--ink-2); }
+.bar button { font: 700 13px var(--sans); color: #fff; background: var(--navy); border: 0; border-radius: 6px; padding: 8px 14px; cursor: pointer; }
+#doc { padding: 8px 16px 48px; }
+.sheet { width: 210mm; max-width: 100%; overflow-x: auto; margin: 0 auto 10mm; padding: 19mm 17mm 17mm; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.08), 0 8px 24px rgba(40,30,10,.12); }
+.sheet.wide { width: 297mm; padding: 14mm 13mm 13mm; }
+.loading { text-align: center; padding: 30mm 0; color: var(--ink-3); }
+
+@media print {
+  body { background: #fff; }
+  .bar { display: none; }
+  #doc { padding: 0; }
+  .sheet, .sheet.wide { width: auto; max-width: none; margin: 0; padding: 0; box-shadow: none; }
+  .sheet + .sheet { break-before: page; }
+  .sheet.wide { page: wide; }
+}
+
+/* ── 제목 ─────────────────────────────── */
+.title { text-align: center; padding: 4mm 0 6mm; border-bottom: 1.4pt solid var(--navy); margin-bottom: 5mm; }
+.title .kind { font: 500 10.5pt var(--serif); color: #5A6678; letter-spacing: .12em; }
+.title h1 { font: 900 25pt/1.25 var(--serif); color: var(--navy); margin: 2mm 0 5mm; letter-spacing: -.01em; }
+.byline { margin: 0; font-size: 10pt; line-height: 1.75; color: var(--ink-2); }
+.byline strong { color: var(--ink); font-size: 11pt; }
+.abstract { margin: 0 0 4mm; padding: 3.2mm 4.5mm; background: var(--tint); border-left: 2.2pt solid var(--navy-2); color: var(--ink-2); font-size: 9.2pt; }
+.abstract p { margin: 0; }
+
+/* ── 제목 단계 ─────────────────────────────── */
+h2 { display: flex; align-items: baseline; gap: 3mm; margin: 9mm 0 3.2mm; padding-bottom: 1.6mm; border-bottom: .8pt solid var(--navy);
+  font: 700 14pt/1.3 var(--serif); color: var(--navy); break-after: avoid; }
+h2 .no { min-width: 9mm; font-weight: 900; }
+h3 { margin: 6mm 0 2.4mm; font: 700 11pt/1.4 var(--sans); color: var(--navy-2); break-after: avoid; }
+.sheet > h2:first-child, .sheet > h3:first-child, .title + .abstract + h2 { margin-top: 2mm; }
+p { margin: 0 0 2.4mm; }
+strong { font-weight: 700; color: var(--ink); }
+ul, ol { margin: 0 0 2.6mm; padding-left: 5.5mm; }
+li { margin: .6mm 0; }
+li > ul, li > ol { margin: .6mm 0 0; }
+ul li::marker { color: var(--navy-2); }
+blockquote { margin: 0 0 3mm; padding: 2.6mm 4mm; background: var(--hi); border-left: 2pt solid #D4A63A; break-inside: avoid; }
+blockquote p { margin: 0 0 1mm; }
+blockquote ul { margin: 0; }
+code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .92em; background: #FBEFD5; color: #8A5A00; padding: 0 .3em; border-radius: 2px; }
+p, li, td { orphans: 2; widows: 2; }
+
+/* ── 표 ─────────────────────────────── */
+table { width: 100%; border-collapse: collapse; margin: 1mm 0 4mm; font-size: 8.6pt; line-height: 1.55; }
+th, td { border: .5pt solid var(--line); padding: 1.5mm 2.2mm; vertical-align: top; text-align: left; }
+thead th { background: var(--head); color: var(--navy); font-weight: 700; text-align: center; vertical-align: middle; }
+thead { display: table-header-group; }
+tr { break-inside: avoid; }
+table.kv td:first-child { width: 22%; background: var(--tint); font-weight: 700; color: var(--ink-2); }
+td strong:first-child { color: var(--navy); }
+
+/* 과정안: 가로 A4, 큰 칸은 쪽에서 나뉠 수 있다 */
+.wide h3 { margin-top: 0; }
+table.lp { table-layout: fixed; font-size: 8.2pt; line-height: 1.5; margin-bottom: 2mm; }
+table.lp tr { break-inside: auto; }
+table.lp td { padding: 1.6mm 2mm; }
+table.lp td:first-child { background: var(--tint); text-align: center; color: var(--ink-2); }
+table.lp td:first-child strong { display: block; font: 700 9.4pt var(--serif); color: var(--navy); }
+table.lp td:nth-child(2) { text-align: center; }
+table.lp td:last-child { background: #FBF8EE; }
+
+/* 판서 계획: 칠판 세 칸 */
+.board { display: grid; grid-template-columns: 1fr 1.7fr 1fr; margin: 1mm 0 4mm; background: #2F4A3A; border: 2.4pt solid #8B6B47; border-radius: 1.5mm;
+  color: #F3F1E8; font-size: 9pt; line-height: 1.6; break-inside: avoid; }
+.board > div { padding: 3mm 4mm; display: flex; flex-direction: column; gap: .4mm; }
+.board > div + div { border-left: .6pt dashed rgba(243,241,232,.35); }
+.board b { font: 700 10pt var(--serif); color: #FFE9A8; margin-bottom: 1mm; }
+.board .mid { text-align: center; }
+.board .mid b { font-size: 12pt; color: #fff; }
