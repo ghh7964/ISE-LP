@@ -133,14 +133,14 @@
   // ── 교실 물건의 문법: 인쇄된 것(교사가 만든 것)과 손글씨(학생이 채운 것)를 나눈다 ──
   // 점토 인형 그림: 3D 교실의 학생 말과 같은 색 (학생 A는 겉모습이 다른 학생과 같다)
   const SKIN = '#F1DCC4';
-  const pawn = (body, x = 30, hp = false) => `<g transform="translate(${x - 30} 0)">
+  const pawn = (body, x = 30) => `<g transform="translate(${x - 30} 0)">
     <ellipse cx="30" cy="77" rx="17" ry="3" fill="rgba(0,0,0,.12)"/>
     <rect x="15" y="34" width="30" height="43" rx="15" fill="${body}"/>
     <circle cx="30" cy="21" r="14" fill="${SKIN}"/>
-    ${hp ? '<path d="M15.5 22 A14.5 14.5 0 0 1 44.5 22" stroke="#2C2F36" stroke-width="3.2" fill="none"/><rect x="11" y="17" width="7" height="11" rx="2.5" fill="#2C2F36"/><rect x="42" y="17" width="7" height="11" rx="2.5" fill="#2C2F36"/>' : ''}</g>`;
+  </g>`;
   const PAWN = {
     A: `<svg viewBox="0 0 60 82">${pawn('#E2B677')}</svg>`,
-    all: `<svg viewBox="0 0 110 82">${pawn('#D98C6B', 22)}${pawn('#E2B677', 55)}${pawn('#7FA7B5', 88, true)}</svg>`,   // 헤드폰은 필요한 사람 누구나
+    all: `<svg viewBox="0 0 110 82">${pawn('#D98C6B', 22)}${pawn('#E2B677', 55)}${pawn('#7FA7B5', 88)}</svg>`,
   };
   // 손글씨가 써지는 모습: 왼쪽에서 오른쪽으로 드러난다
   const write = (tl, els, at, stagger = 0.18) =>
@@ -255,7 +255,7 @@
   });
 
   // ── 정보 스테이션: 엔트리식 블록 코드 + 실행 화면 ─────
-  // 블록 문장은 지도안 Ⅹ.5 시뮬레이터 설계를 그대로 옮겼다 (0 금, 1~3 은, 4~9 동)
+  // 블록 문장은 지도안 Ⅺ.5 시뮬레이터 설계를 그대로 옮겼다 (0 금, 1~3 은, 4~9 동)
   const F = (t) => `<i class="f">${t}</i>`;
   const V = (t) => `<i class="v">${t} ▾</i>`;
   const Cnd = (t) => `<i class="cnd">${t}</i>`;
@@ -267,14 +267,14 @@
     <div class="u cb">
       <div class="blk flow head" data-k="rep">${F('횟수')} 번 반복하기 <b class="cnt"></b></div>
       <div class="arm">
-        ${leaf('data', `${V('공')} 을 ${Calc(`${F(0)} 부터 ${F(9)} 사이의 무작위 수`)} 로 정하기`)}
+        ${leaf('data', `${V('수')} 를 ${Calc(`${F(0)} 부터 ${F(9)} 사이의 무작위 수`)} 로 정하기`)}
         <div class="u cb">
-          <div class="blk flow head" data-k="g">만약 ${Cnd(`${F('공')} = ${F(0)}`)} 이라면</div>
+          <div class="blk flow head" data-k="g">만약 ${Cnd(`${F('수')} = ${F(0)}`)} 이라면</div>
           <div class="arm">${add('금', 1)}${add('받은 돈', '5000')}</div>
           <div class="mid">아니면</div>
           <div class="arm">
             <div class="u cb">
-              <div class="blk flow head" data-k="s">만약 ${Cnd(`${F('공')} &lt; ${F(4)}`)} 이라면</div>
+              <div class="blk flow head" data-k="s">만약 ${Cnd(`${F('수')} &lt; ${F(4)}`)} 이라면</div>
               <div class="arm">${add('은', 1)}${add('받은 돈', '1000')}</div>
               <div class="mid" data-k="b">아니면</div>
               <div class="arm">${add('동', 1)}</div>
@@ -291,7 +291,7 @@
 
   def('sim', {
     html: () => `<div>
-      <div class="sim-bar"><b>정보 스테이션 · 엔트리 뽑기 시뮬레이터</b><span class="meta">지도안 Ⅹ.5 설계 그대로</span></div>
+      <div class="sim-bar"><b>정보 스테이션 · 엔트리 뽑기 시뮬레이터</b><span class="meta">지도안 Ⅺ.5 설계 그대로</span></div>
       <div class="sim-body">
         <div class="sim-code">
           <div class="cats">${CATS.map(([n, c]) => `<div><i style="background:${c}"></i>${n}</div>`).join('')}</div>
@@ -519,7 +519,7 @@
       <div class="st-say">“A가 20번 모두 다시 넣었는지 확인해서<br>우리 모둠 기록을 믿을 수 있어요”</div>
       <div class="tb-note">자폐성장애의 일반 특성이 아니라, 관찰로 확인한 <b>A 개인의 강점</b>으로 다룬다</div>`,
     day: `<div class="tb-h">A의 45분 <small>개별 일과표 카드 · 3모둠</small></div><div class="sched">
-      ${[['', '도입', 5, '전체 · T1', 'O·X 카드로 예측 · 일과표 확인 · 헤드폰은 스스로 고른다'],
+      ${[['', '도입', 5, '전체 · T1', 'O·X 카드로 예측 · 일과표 확인'],
         ['m', '수학', 10, 'T2 · T4', '<b>진행자</b> · 자기 모습 절차 영상. 연습한 절차와 익숙한 T4로 시작한다'],
         ['-', '1분 전: TV 타이머 색이 바뀌고, 일과표 카드로 한 번 더 예고 · 짝과 이동'],
         ['i', '정보', 10, 'T3', '<b>발표자</b> · 4단계 절차 영상 · 스크립트 카드'],
@@ -528,7 +528,7 @@
         ['', '정리', 7, 'T1 · T2', '스티커 투표 · 발표 스크립트 카드']].map((r) => r[0] === '-'
         ? `<div class="sc-tr">${r[1]}</div>`
         : `<div class="sc-row ${r[0]}"><span class="sc-ck">✓</span><b>${r[1]}</b><em>${r[2]}′</em><i>${r[3]}</i><span>${r[4]}</span></div>`).join('')}</div>
-      <div class="pn pn-day">↳ 힘들면 휴식 카드 → 쉼 자리 3분 (누구나 쓴다)</div>`,
+      <div class="pn pn-day">↳ 힘들면 휴식 카드 → 쉼 자리 3분 · 헤드폰 (누구나 쓴다)</div>`,
   };
   def('profile', {
     html: () => `<div><div class="rc pf-card"><i class="clip"></i>
@@ -593,14 +593,14 @@
         <div><b>④ 계산</b><span>${chip('수학', 'm')}</span></div></div>
       <p class="flow-note">혼자 해내는 모습만 남긴 약 1분 30초 영상 30개. 아직 못 하는 것을 <mark>“해내는 나”</mark>로 먼저 본다.</p>
       <div class="pn pn-flow">↳ 우리 분석: 절차 자체가 여러 감각과 교과를 오간다 → 융합수업에 옮기기 자연스럽다</div>
-      <div class="tb-h">용암: 영상을 줄여 간다</div>
+      <div class="tb-h">용암법: 영상을 줄여 간다</div>
       <div class="fade">${[[10, '1단계'], [5, '2단계'], [0, '3단계']].map(([n, t]) => `<div><b>${t}</b><span class="film">${Array.from({ length: 10 }, (_, i) => `<i class="${i < n ? 'on' : ''}"></i>`).join('')}</span><em>영상 ${n}개</em></div>`).join('<i class="arr">→</i>')}</div>
       <p class="fade-rule">연속 3회기 평균 80% 이상이면 다음 단계로</p>`,
     apply: `<div class="pp-apply"><div><div class="tb-h">왜 이 방법인가</div><div class="why">
         <div><b>대상이 같다</b>특수학급 소속, 시간제 통합, 자폐성장애 중학생</div>
         <div><b>지적장애 동반에도 맞다</b>여러 단계 말 지시 대신 한 단계씩 보이는 시범</div>
         <div><b>내용이 이어진다</b>화폐의 계산 ↔ 1,000원 내고 얼마를 돌려받나</div>
-        <div><b>통합학급에서 혼자 참여</b>용암으로 교사 촉구 없이 모둠 안에서</div>
+        <div><b>통합학급에서 혼자 참여</b>용암법으로 교사 촉구 없이 모둠 안에서</div>
         <div><b>모두에게 열린 도구</b>모든 모둠이 같은 태블릿으로 교사 시범을 본다</div>
         <div><b>저자의 제언을 잇는다</b>다교과 접근 → 수학 · 사회 · 정보 융합</div></div></div>
       <div><div class="tb-h">수학 스테이션 과제분석 5단계</div><ol class="steps5">
@@ -633,8 +633,8 @@
   const NOTE = {
     lead: { pic: PAWN.A, who: '학생 A: 수학 스테이션 진행자', what: '태블릿에서 자기 모습이 담긴 절차 영상(5단계)을 이어폰으로 한 번 보고 시작합니다. 20번의 차례를 횟수판에 세고, 토큰이 캡슐에 다시 들어갔는지 확인합니다. 이 규칙이 지켜져야 모둠의 데이터가 정확해집니다', std: '강점으로 기여하는 역할 · 지도안 Ⅷ.1' },
     vocab: { pic: VOCAB_ICON, who: '어려운 말은 쉬운 말로 먼저', what: '"상대도수"는 먼저 <b>전체 중에서 그 색이 나온 비율</b>이라고 말하고, 식(나온 횟수 ÷ 전체 횟수)은 그다음에 보입니다. 카드는 스테이션마다 두고 누구나 봅니다', std: '지도안 Ⅺ.6 핵심 어휘 풀이 카드 · 기초소양(언어)' },
-    info: { pic: PAWN.A, who: '학생 A: 정보 스테이션 발표자', what: '논문의 절차를 블록 코드에 옮긴 4단계 영상: <b>소리 내어 읽기 → \'횟수\'에 동그라미하고 버튼 → 가장 긴 막대 찾기 → 스크립트로 말하기</b>. 10번 실행은 영상을 보고, 100번은 필요할 때, 1,000번은 영상 없이 합니다', std: '비디오 자기 모델링 · 용암 · 지도안 Ⅴ.3, 전개 ③' },
-    all: { pic: PAWN.all, who: '모두를 위한 지원', what: '같은 태블릿, 일과표, 역할 카드, 어휘 카드가 처음부터 모든 모둠의 책상에 놓여 있었습니다. 다른 모둠은 교사 시범 영상을, A는 자기 모습 영상을 볼 뿐입니다. 그래서 눈에 띄지 않습니다', std: 'UDL · 통합교육 4대 원리 ② 자연스러운 비가시적 지원' },
+    info: { pic: PAWN.A, who: '학생 A: 정보 스테이션 발표자', what: '논문의 절차를 블록 코드에 옮긴 4단계 영상: <b>소리 내어 읽기 → \'횟수\'에 동그라미하고 버튼 → 가장 긴 막대 찾기 → 스크립트로 말하기</b>. 10번 실행은 영상을 보고, 100번은 필요할 때, 1,000번은 영상 없이 합니다', std: '비디오 자기 모델링 · 용암법 · 지도안 Ⅴ.3, 전개 ③' },
+    all: { pic: PAWN.all, who: '모두를 위한 지원', what: '같은 태블릿, 일과표, 역할 카드, 어휘 카드가 처음부터 A만이 아니라 모든 모둠을 위해 놓여 있었습니다. 다른 모둠은 교사 시범 영상을, A는 자기 모습 영상을 볼 뿐입니다. 그래서 눈에 띄지 않습니다', std: 'UDL · 통합교육 4대 원리 ② 자연스러운 비가시적 지원' },
   };
   def('note', {
     html: () => `<div><div class="cap-strip rc"><i class="clip"></i><div class="cap-in"></div></div></div>`,
@@ -646,7 +646,7 @@
     },
   });
 
-  // ── 개별화 평가 (지도안 Ⅹ.1): 과제분석 단계마다 촉구 수준을 적고, 독립 수행률로 용암 시점을 정한다 ──
+  // ── 개별화 평가 (지도안 Ⅹ.1): 과제분석 단계마다 촉구 수준을 적고, 독립 수행률로 용암법 시점을 정한다 ──
   const REC_STEPS = ['통에서 캡슐 1개 뽑기', '캡슐 열어 토큰 색 보기', '같은 색 칸에 스티커 붙이기', '토큰을 넣어 닫고 통에 돌려놓기', '통을 짝에게 넘기기'];
   const REC = ['시독시언독', '독독언독독', '독독독언독', '독독독독독'];   // 회기별 예시 기록
   const pct = (r) => Math.round([...r].filter((c) => c === '독').length / r.length * 100);
@@ -659,7 +659,7 @@
         ${REC_STEPS.map((t, j) => `<tr><td><b>${j + 1}</b>${t}</td>${REC.map((r) => `<td><span class="hw cd${r[j] === '독' ? '' : ' p'}">${r[j]}</span></td>`).join('')}</tr>`).join('')}
         <tr class="sum"><td>독립 수행률</td>${REC.map((r, i) => `<td><span class="hw">${pct(r)}%</span>${i === 1 ? `<svg class="pencil rec-loop" viewBox="0 0 200 70" preserveAspectRatio="none"><path pathLength="1" d="M26 18 C 60 4, 176 4, 190 28 C 202 50, 128 66, 54 62 C 12 59, 4 40, 18 26 C 26 18, 44 12, 62 10"/></svg>` : ''}</td>`).join('')}</tr></tbody></table>
       <div class="rec-key">독 독립 · 언 언어 촉구 · 시 시범 · 신 신체 촉구</div>
-      <div class="pn pn-rec">↳ 연속 3회기 80% 이상 → 다음 용암 단계 (영상을 줄인다)</div>
+      <div class="pn pn-rec">↳ 연속 3회기 80% 이상 → 다음 용암법 단계 (영상을 줄인다)</div>
       <div class="rec-adj"><b>평가 조정</b> 말하기 · 가리키기 · 스티커로 답한다 · 문항을 읽어 준다 · 시간 연장 · 기본교육과정 연계 목표로 평가해 IEP 진전에 반영</div></div></div>`,
     enter(tl, at) {
       tl.fromTo(this.q('.sheet'), { x: 50, rotation: 2, opacity: 0 }, { x: 0, rotation: 0.4, opacity: 1, duration: 0.7, ease: 'power3.out' }, at);

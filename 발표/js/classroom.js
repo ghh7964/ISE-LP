@@ -82,7 +82,7 @@
     s.add(mesh(rbox(1.24, 0.82, 0.58, 0.03), mat(0xA27D57), 2.5, 0.41, -3.55));
   }
 
-  // ── 칠판 판서 (지도안 Ⅹ.3 판서 계획) ───────────
+  // ── 칠판 판서 (지도안 Ⅺ.3 판서 계획) ───────────
   const CHALK = '#EDEBE2', CHALK_Y = '#F3D37C', CHALK_DIM = 'rgba(237,235,226,.55)';
   const hand = (px, w = 700) => W.font(px, w, 'Gaegu');
   function chalkLines(name) {
@@ -94,8 +94,8 @@
       L.push({ t: '기대행동 3가지', x: 80, y: 560, f: hand(40, 400), c: CHALK_DIM });
       L.push({ t: '뽑기, 정말 이득일까?', x: 1024, y: 130, f: hand(86), c: CHALK_Y, a: 'center' });
       L.push({ t: '금 5,000원 · 은 1,000원 · 동 꽝', x: 760, y: 250, f: hand(48), c: CHALK });
-      ['금색 확률 = 1/10', '우리 모둠 한 번 평균 = ___원', '1,000번 한 번 평균 = ___원', '기회비용 = ___'].forEach((t, i) =>
-        L.push({ t, x: 760, y: 340 + i * 82, f: hand(48, 400), c: CHALK }));
+      ['금색 확률 = 1/10', '우리 모둠 한 번 평균 = ___원', '학급 전체(120번) 평균 = ___원', '1,000번 한 번 평균 = ___원', '기회비용 = ___'].forEach((t, i) =>
+        L.push({ t, x: 760, y: 336 + i * 66, f: hand(46, 400), c: CHALK }));
       L.push({ t: '결론 투표판', x: 1610, y: 110, f: hand(52), c: CHALK_Y });
       ['한다  ○○○', '안 한다  ○○○', '이유:'].forEach((t, i) => L.push({ t, x: 1620, y: 200 + i * 76, f: hand(44, 400), c: CHALK }));
       L.push({ rule: [[560, 50], [560, 700]] }, { rule: [[1560, 50], [1560, 700]] });
@@ -176,14 +176,6 @@
     g.userData.headY = teacher ? 1.08 : 0.79;
     return g;
   }
-  // 헤드폰: 반원 호는 +x → 위 → −x 로 그려지므로 회전 없이 양쪽 귀(컵)를 잇는다
-  function headphones(m, r) {
-    const g = new T.Group();
-    g.add(mesh(new T.TorusGeometry(r, r * 0.12, 8, 24, Math.PI), m, 0, 0, 0));
-    const cupG = new T.CylinderGeometry(r * 0.37, r * 0.37, r * 0.27, 16);
-    [-1, 1].forEach((sgn) => { const c = mesh(cupG, m, sgn * r, 0, 0); c.rotation.z = Math.PI / 2; g.add(c); });
-    return g;
-  }
   R.students = [];
   R.teachers = [];
   const rowPos = (i) => ({ x: -3.0 + (i % 6) * 1.2, z: -1.5 + Math.floor(i / 6) * 1.4 });
@@ -247,7 +239,7 @@
   // ── 책상과 교구 ──────────────────────────────
   R.tables = [];
   R.rowDesks = [];
-  R.props = { picture: [], schedule: [], role: [], sticker: [], sheet: [], bins: [], laptops: [], hp: [], tokens: [], tablets: [], counters: [] };
+  R.props = { picture: [], schedule: [], role: [], sticker: [], sheet: [], bins: [], laptops: [], tokens: [], tablets: [], counters: [] };
   const sheetTex = {};
   function makeSheetTex() {
     sheetTex.normal = W.canvasTex(256, 184, (c, w, h) => {
@@ -402,14 +394,9 @@
       sheet.rotation.x = -Math.PI / 2;
       sheet.rotation.z = 0.12;
       g.add(sheet);
-      const hpm = glowMat(0x2C2F36, { roughness: 0.5 });
-      const hpT = headphones(hpm, 0.085);
-      hpT.position.set(0, 0.77, 0.42);
-      hpT.rotation.x = -Math.PI / 2;   // 책상 위에 눕혀 둔다
-      g.add(hpT);
-      P.picture = pic; P.schedule = [sch]; P.role = roles; P.sheet = sheet; P.hp = hpm;
+      P.picture = pic; P.schedule = [sch]; P.role = roles; P.sheet = sheet;
       P.picG = picG; P.schG = schG; P.roleMesh = roleMeshes;
-      R.props.picture.push(pic); R.props.schedule.push(sch); R.props.role.push(...roles); R.props.sheet.push(sheet); R.props.hp.push(hpm);
+      R.props.picture.push(pic); R.props.schedule.push(sch); R.props.role.push(...roles); R.props.sheet.push(sheet);
 
       if (st === 0) {   // 사회: 선택 카드
         ['#E58C6A', '#8FB3A0', '#E8C76A', '#9AA7D0'].forEach((c, n) =>
@@ -575,7 +562,7 @@
 
   // ── Bruner 3층: 같은 20번의 결과를 세 가지 표상으로 ─────
   R.layerPlanes = [];
-  const LAYER_TITLES = [['작동적 표상', '실물 공으로 직접 뽑기'], ['영상적 표상', '스티커 그래프'], ['상징적 표상', '수와 식']];
+  const LAYER_TITLES = [['작동적 표상', '캡슐을 직접 뽑아 토큰 보기'], ['영상적 표상', '스티커 그래프'], ['상징적 표상', '수와 식']];
   function tallyData() {
     if (!D.data.tally) {
       const seq = Array.from({ length: 20 }, D.draw);
@@ -644,7 +631,7 @@
     const tabs = [
       { id: 'goal-all', html: '<b>모두</b>뽑아 보고 표·그래프로 나타낸다', pos: at(0, 0.75, 0.32), span: [at(1, 0.75, HALF), at(0, 0.75, -HALF)], cls: 'pin-goal g-all' },
       { id: 'goal-most', html: '<b>대부분</b>상대도수·평균으로 이득을 따진다', pos: at(2, 0.75, 0), span: [at(2, 0.75, HALF), at(2, 0.75, -HALF)], cls: 'pin-goal g-most' },
-      { id: 'goal-some', html: '<b>일부</b>상금을 바꿔 코드로 논증한다', pos: at(2, 0.42, HALF), cls: 'pin-goal pin-up g-some' },
+      { id: 'goal-some', html: '<b>일부</b>상금을 바꿔 본전 상금을 추론한다', pos: at(2, 0.42, HALF), cls: 'pin-goal pin-up g-some' },
     ];
     const pa = new T.Vector3(), pb = new T.Vector3();
     tabs.forEach((t) => {
@@ -693,7 +680,7 @@
     const m = R.tableAt(1, 0), f = R.tableAt(2, 0);   // 학생 A: 수학(모둠 시작) → 정보(순환 뒤), 둘 다 k = 0 책상
     if (l === 'lead') return [m.tablet.userData.frame, m.counter.userData.frame, m.role[1]];
     if (l === 'A') return [f.tablet.userData.frame, f.role[1], f.schedule[0]];
-    if (l === 'all') return [...R.props.picture, ...R.props.schedule, ...R.props.role, ...R.props.sticker, ...R.props.tokens, ...R.props.hp, ...R.props.tablets, ...R.props.counters];
+    if (l === 'all') return [...R.props.picture, ...R.props.schedule, ...R.props.role, ...R.props.sticker, ...R.props.tokens, ...R.props.tablets, ...R.props.counters];
     return [];
   }
   const LENS_PINS = { lead: ['tag-A', 'lp-tab1', 'lp-cnt'], A: ['tag-A', 'lp-tab2', 'lp-scr', 'lp-sch'], all: [], vocab: [] };

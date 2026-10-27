@@ -45,7 +45,7 @@
     // s4 관련 논문 분석 → 교수 방법
     { scene: 's4', label: '논문: 대상과 설계', set: { overlay: 'paper:info', pins: [], speaker: SPEAKERS.정보, doc: [sec('h3', '1. 분석 논문')] } },
     { scene: 's4', label: '결과: 기초선 0% → 영상을 줄여도 유지', set: { overlay: 'paper:result', doc: [{ sel: 'tr', first: '결과' }] } },
-    { scene: 's4', label: '방법: 비디오 자기 모델링과 용암', set: { overlay: 'paper:how', doc: [{ sel: 'tr', first: '독립변인' }, { sel: 'tr', first: '용암' }] } },
+    { scene: 's4', label: '방법: 비디오 자기 모델링과 용암법', set: { overlay: 'paper:how', doc: [{ sel: 'tr', first: '독립변인' }, { sel: 'tr', first: '용암법' }] } },
     { scene: 's4', label: '우리 수업에 적용', set: { overlay: 'paper:apply', doc: [sec('h3', '3. 본시 적용')] } },
 
     // s5 수업이 기르는 역량 → 사회 스테이션 (세 스테이션의 첫째)
@@ -77,7 +77,7 @@
     // s8 통합교육 장치
     { scene: 's8', label: '교실 전체 · 개별 지원은 A 한 명, T4는 수학 공동 교수', set: { overlay: null, cam: 'room', pins: ['t4'], speaker: SPEAKERS.특수,
         doc: [{ col: '개별 지원', strong: 'A' }] } },
-    { scene: 's8', label: '개별화 평가: 단계별 수행 기록 → 용암 시점', set: { overlay: 'rec', cam: 'roomL', pins: [],
+    { scene: 's8', label: '개별화 평가: 단계별 수행 기록 → 용암법 시점', set: { overlay: 'rec', cam: 'roomL', pins: [],
         doc: [{ sel: 'tr', first: '모두(학생 A)' }, { sel: 'li', text: '개별화 평가(기준표는 T4가 준비)' }] } },
     { scene: 's8', label: '모두를 위한 지원', set: { lens: 'all', pins: [], overlay: 'note:all', cam: 'room',
         doc: [{ sel: 'p', text: '모두에게 주는 기본 설계' }] } },
