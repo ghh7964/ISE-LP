@@ -171,7 +171,17 @@
       <div class="sh-row"><span>저금</span><span>1,000원</span><span class="hw">✓</span></div>
       <div class="sh-oc">뽑기를 고르면 포기하는 것 = <b>기회비용</b><span class="fill"><i class="hw">컵떡볶이</i></span></div>
       <div class="sh-next">그럼 뽑기로는 <b>평균 얼마</b>를 돌려받을까? → 수학 스테이션</div>
-      <div class="std">[9사(일사)08-01] · 비용·편익 표(그래픽 조직자)</div></div></div>`,
+      <div class="std">[9사(일사)08-01] · 비용·편익 표(그래픽 조직자)</div></div>
+      <div class="soc-a"><i class="tape"></i>
+        <div class="sa-top"><span>학생 A · 사회 절차 영상</span>${chip('3단계')}</div>
+        <ol class="sa-steps"><li>그림 카드 두 장 보기</li><li>하나 고르기</li><li>이유 카드로 말하기</li></ol>
+        <div class="sa-cards">
+          <div class="pic"><svg viewBox="0 0 80 64"><path d="M18 26 L62 26 L56 58 L24 58 Z" fill="#FBF8F1" stroke="#8A847A" stroke-width="2"/><path d="M22 26 C 26 12, 38 10, 40 18 C 44 8, 58 12, 58 26" fill="#D9573B"/><circle cx="34" cy="20" r="3" fill="#F3E7C8"/><circle cx="46" cy="18" r="3" fill="#F3E7C8"/></svg><b>컵떡볶이</b>${pencilLoop}</div>
+          <div class="pic"><svg viewBox="0 0 80 64"><circle cx="40" cy="34" r="22" fill="#FBF8F1" stroke="#8A847A" stroke-width="2"/><path d="M18 34 A22 22 0 0 1 62 34 Z" fill="#F4C552"/><line x1="18" y1="34" x2="62" y2="34" stroke="#8A847A" stroke-width="2"/><text x="40" y="52" text-anchor="middle" font-size="14" font-weight="700" fill="#8A847A">?</text></svg><b>뽑기 1회</b></div>
+        </div>
+        <div class="sa-say"><span class="lab">이유 카드</span>나는 <i class="hw">떡볶이</i>를 골라요. <i class="hw">확실해서</i>요.</div>
+        <div class="pn pn-soc">↳ 친구들과 같은 질문, 그림 카드로</div>
+        <div class="std">IEP 사회(자기 결정) · [9사회01-02] · 지원 T1</div></div></div>`,
     enter(tl, at) {
       const q = this.q.bind(this);
       tl.fromTo(q('.sheet'), { x: 50, rotation: 2.5, opacity: 0 }, { x: 0, rotation: 0.8, opacity: 1, duration: 0.7, ease: 'power3.out' }, at);
@@ -179,6 +189,17 @@
       tl.fromTo(q('.pencil path'), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.6, ease: 'power1.inOut' }, at + 1.4);
       write(tl, q('.sh-oc .hw'), at + 2.0);
       tl.fromTo(q('.sh-next'), { opacity: 0 }, { opacity: 1, duration: 0.5 }, at + 2.4);
+      tl.set(q('.soc-a'), { opacity: 0 }, at);
+    },
+    // social:A 학생 A의 사회 활동: 같은 질문을 그림 카드 두 장과 이유 카드로
+    mode(tl, m, prev, at) {
+      const q = this.q.bind(this), c = q('.soc-a');
+      if (m !== 'A') { if (prev === 'A') tl.to(c, { opacity: 0, x: -20, duration: 0.3, ease: 'power1.in' }, at); return; }
+      const t = prev === undefined ? at + 1.2 : at;
+      tl.fromTo(c, { x: -40, rotation: -3, opacity: 0 }, { x: 0, rotation: -1.2, opacity: 1, duration: 0.6, ease: 'power3.out' }, t);
+      tl.fromTo(q('.sa-cards .pencil path'), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.6, ease: 'power1.inOut' }, t + 0.8);
+      write(tl, this.qa('.sa-say .hw'), t + 1.4, 0.35);
+      write(tl, q('.pn-soc'), t + 2.2);
     },
   });
 

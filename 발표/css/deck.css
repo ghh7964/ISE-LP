@@ -259,6 +259,21 @@ html.nogl #pins { display: none; }
 .sh-oc .fill .hw { font-size: 38px; display: inline-block; }
 .sh-next { margin-top: 12px; font-size: 22px; color: var(--ink-2); }
 .sh-next b { color: var(--ink); }
+.soc-a { position: absolute; right: 712px; top: 300px; width: 470px; padding: 22px 26px 18px; background: #EFDDB0; color: var(--ink);
+  box-shadow: 0 14px 28px rgba(40,30,10,.24), 0 2px 5px rgba(40,30,10,.12); opacity: 0; }
+.soc-a .tape { position: absolute; left: 50%; top: -14px; width: 110px; height: 28px; margin-left: -55px; background: rgba(250,246,232,.75); transform: rotate(2deg); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+.sa-top { display: flex; justify-content: space-between; align-items: baseline; font-size: 20px; font-weight: 700; color: var(--ink-2); border-bottom: 2px solid var(--ink); padding-bottom: 6px; }
+.sa-steps { margin: 10px 0 12px; padding-left: 28px; font-size: 21px; line-height: 1.45; }
+.sa-cards { display: flex; gap: 18px; justify-content: center; }
+.sa-cards .pic { position: relative; width: 150px; padding: 10px 8px 8px; background: var(--sheet); border: 1px solid rgba(27,26,24,.25); text-align: center; }
+.sa-cards .pic svg:not(.pencil) { width: 92px; height: auto; display: block; margin: 0 auto 4px; }
+.sa-cards .pic b { font-size: 21px; }
+.sa-cards .pencil { left: -12px; top: -12px; width: calc(100% + 24px); height: calc(100% + 24px); }
+.sa-say { margin-top: 14px; padding: 10px 14px; background: var(--sheet); border: 1px dashed rgba(27,26,24,.4); font-size: 22px; line-height: 1.5; word-break: keep-all; }
+.sa-say .lab { display: block; font-size: 17px; font-weight: 700; color: var(--ink-3); }
+.sa-say .hw { font-size: 28px; padding: 0 4px; border-bottom: 1px solid var(--ink-3); }
+.pn-soc { margin-top: 12px; font-size: 25px; }
+.soc-a .std { font-size: 18px; color: var(--ink-3); margin-top: 8px; }
 
 /* 수학: 모눈종이 기록지 */
 .sheet.grid {
