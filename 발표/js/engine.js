@@ -33,7 +33,7 @@
     const panelA = a.panel && !E.docHidden, panelB = b.panel && !E.docHidden;
 
     const leaving = (an && an !== bn) || pinsOut.length || b.layers < a.layers ||
-      (a.lens && a.lens !== b.lens) || (a.card != null && a.card !== b.card) || (a.arrows && !b.arrows);
+      (a.lens && a.lens !== b.lens) || (a.arrows && !b.arrows);
     const tA = 0, tB = leaving ? 0.42 : 0;
 
     // A
@@ -77,7 +77,6 @@
     if (b.layers > a.layers) R.setLayers(t, b.layers, tC);
     pinsIn.forEach((p, i) => W.pinTo(t, p, true, tC + 0.15 + i * 0.06));
     R.setLens(t, b.lens, a.lens, tA, tC);
-    R.setCard(t, b.card, a.card, b.night && !a.night ? tC : tA, tC);   // 밤으로 바뀔 때는 어두워진 뒤에 교실을 되돌린다
 
     // 지도안: 패널이 들어오는 동안 해당 부분으로 내려간다
     t.call(() => D.doc.highlight(b.doc), null, panelB && !panelA ? tB + (fx.panelAt ?? 0) : tB);
@@ -97,11 +96,8 @@
   function runAction(step) {
     if (!step.action) return null;
     const [mod, act] = step.action;
-    let t;
-    if (mod === 'room') { t = gsap.timeline(); R.wallShimmer(t, 0.1); }
-    else t = D.ov.action(mod, act);
-    actTl = t;
-    return t;
+    actTl = D.ov.action(mod, act);
+    return actTl;
   }
 
   // 진행 중인 전환을 끝까지 보낸다. 끝나면 실행하려던 동작은 버린다 (다른 단계로 떠나는 중이므로)
@@ -110,11 +106,9 @@
     tl.eventCallback('onComplete', null);
     tl.progress(1);
   }
-  let cardMode = false;
-
   E.go = function (k, { instant = false } = {}) {
     k = D.clamp(k, 0, D.STEPS.length - 1);
-    if (k === idx && cur && !cardMode) return;
+    if (k === idx && cur) return;
     const fwd = k === idx + 1;
     const step = D.STEPS[k];
     if (running(actTl)) actTl.progress(1);
@@ -122,7 +116,6 @@
     if (k === 0) { D.machine.clearNow(); D.data = {}; E.t0 = null; }   // 처음으로: 리허설 흔적을 지운다
     const t = transition(E.stateAt(k), fwd ? step.fx : { camDur: 1.4 });
     idx = k;
-    cardMode = false;
     if (fwd && step.action) t.eventCallback('onComplete', () => runAction(step));
     else if (!fwd && step.restore) t.eventCallback('onComplete', () => D.ov.action(...step.restore).progress(1));
     if (instant) t.progress(1);
@@ -142,23 +135,6 @@
   E.prev = () => E.go(idx - 1);
   E.busy = () => running(tl) || running(actTl);
   E.index = () => idx;
-
-  // 숫자 키: 어느 단계에서든 지원 카드 장면으로 (질의응답용)
-  E.card = function (i) {
-    const row = (D.cardRows || [])[i];
-    if (!row) return;
-    if (running(actTl)) actTl.progress(1);
-    settle();
-    const base = E.stateAt(D.CARD_STEP);
-    const target = Object.assign(base, {
-      card: i, overlay: 'card:' + i, cam: (D.supportCards[i] || {}).cam || 'room',
-      doc: [{ sel: 'tr', first: row.area }],
-    });
-    transition(target, {});
-    idx = D.CARD_STEP;
-    cardMode = i !== D.STEPS[D.CARD_STEP].set.card ? row.area : false;
-    E.broadcast();
-  };
 
   E.rerun = function () {
     const step = D.STEPS[idx];
@@ -182,7 +158,7 @@
   E.stateMsg = () => {
     const s = D.STEPS[idx], n = D.STEPS[idx + 1];
     const inScene = D.STEPS.slice(0, idx + 1).filter((x) => x.scene === s.scene).length - 1;
-    return { type: 'state', idx, total: D.STEPS.length, scene: s.scene, sub: inScene, label: cardMode ? `카드: ${cardMode}` : s.label,
+    return { type: 'state', idx, total: D.STEPS.length, scene: s.scene, sub: inScene, label: s.label,
       next: n ? n.label : '(끝)', speaker: cur ? cur.speaker : '', t0: E.t0 || null, sceneEnd: D.SCENE_END };
   };
   E.broadcast = function () {
@@ -221,7 +197,6 @@
     if (['ArrowLeft', 'PageUp', 'Backspace', 'ArrowUp'].includes(k)) { e.preventDefault(); E.prev(); return; }
     if (k === 'Home') { E.go(0); return; }
     if (k === 'End') { E.go(D.STEPS.length - 1); return; }
-    if (/^[0-9]$/.test(k)) { E.card((+k + 9) % 10); return; }
     switch (k.toLowerCase()) {
       case 'f':
         if (document.fullscreenElement) document.exitFullscreen();
@@ -256,15 +231,15 @@
   D.boot = async function () {
     await D.content.load();
     D.doc.render(D.content.jidoan);
-    D.cardRows = D.doc.cardRows();
+    D.vocab = D.doc.vocabRows();
     D.doc.check(D.STEPS);
-    if (D.cardRows.length < 10) D.toast('지도안 Ⅹ.1 지원 카드 표를 찾지 못했습니다. 카드 문구가 비어 있을 수 있습니다', 5000);
+    if (!D.vocab.length) D.toast('지도안 Ⅺ.6 핵심 어휘 풀이 카드 표를 찾지 못했습니다. 벽 게시판이 비어 있습니다', 5000);
     await fontsReady();
     fit();
     window.addEventListener('resize', fit);
     W.init(D.$('#gl'));
     D.machine.build();
-    R.build(D.cardRows);
+    R.build(D.vocab);
     D.ov.init();
     W.covered = () => D.ov.reg.sim.el.style.visibility === 'visible' && +getComputedStyle(D.ov.reg.sim.el).opacity === 1 && D.view.panel >= D.PANEL - 0.5;
 

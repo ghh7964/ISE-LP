@@ -1,5 +1,5 @@
 // 교실 디오라마 (1 = 1m, 일반교실 표준 7.5m × 9m: 칠판 쪽 벽 7.5m, 앞뒤 9m): 교실, 모둠 책상과 교구, 학생·교사 말, 스테이션, 순환 화살표,
-// 칠판(판서), 벽 게시판의 지원 카드 10장, Bruner 3층, 렌즈와 카드별 교실 변화
+// 칠판(판서), 벽 게시판의 핵심 어휘 풀이 카드, Bruner 3층, 렌즈(학생 A의 역할 · 학생 A를 위한 지원 · 모두를 위한 지원)
 (function () {
   const T = THREE, W = D.world;
   const R = D.room = {};
@@ -9,9 +9,7 @@
   const TZ = [-0.5, 2.3];                 // 스테이션마다 책상 두 개
   const SEATS = [[-0.45, -0.78], [0.45, -0.78], [-0.45, 0.78], [0.45, 0.78]];
   const STATION = ['사회', '수학', '정보'];
-  R.A = 3;                                // 학생 A: 1모둠 (사회 → 수학)
-  R.B = 9;                                // 학생 B: 3모둠 (수학 → 정보)
-  R.spread = 0;                           // 지체장애 카드: 책상 사이를 넓힌다
+  R.A = 9;                                // 학생 A: 3모둠 (수학 → 정보 → 사회). 두 스테이션 모두 k = 0 책상, 같은 자리
 
   const C = {
     floor: 0xD9CBB2, slab: 0xBFAE92, wall: 0xEEE7DA, wall2: 0xE6DDCC,
@@ -23,7 +21,7 @@
   const GLOW = new T.Color(0xFFC861);
   const GOLD = new T.Color(0xF2B232);
 
-  const tablePos = (s, k, sp = R.spread) => ({ x: SX[s] * (1 + 0.12 * sp), z: TZ[k] + (k ? 0.5 : -0.5) * sp });
+  const tablePos = (s, k) => ({ x: SX[s], z: TZ[k] });
 
   // ── 빛나는 교구 ───────────────────────────────
   const glowing = new Set();
@@ -194,7 +192,7 @@
     const g = Math.floor(i / 4), j = i % 4;
     const s = mode === 'rotated' ? (Math.floor(g / 2) + 1) % 3 : Math.floor(g / 2);
     const tp = tablePos(s, g % 2);
-    return { x: tp.x + SEATS[j][0] * (1 + 0.15 * R.spread), z: tp.z + SEATS[j][1] * (1 + 0.15 * R.spread) };
+    return { x: tp.x + SEATS[j][0], z: tp.z + SEATS[j][1] };
   }
   R.studentMode = 'rows';
 
@@ -206,12 +204,6 @@
       s.add(p);
       R.students.push(p);
     }
-    // 학생 B 의 헤드폰: 늘 쓰고 있지 않고, 시끄러울 때 스스로 골라 쓴다 (렌즈 B 에서만 머리에 씌운다)
-    const b = R.students[R.B];
-    const hp = R.hpB = hidden(headphones(R.mat_hp = glowMat(0x2C2F36, { roughness: 0.5 }), 0.15));
-    hp.position.y = b.userData.headY;
-    b.add(hp);
-
     const TPOS = [[-2.5, 0.9], [-0.42, 0.9], [2.5, 0.9], [0.42, 0.9]];   // T2 · T4 는 수학 스테이션 공동 교수
     const TCOL = [C.navy, C.navy, C.navy, 0x2F5E8C];
     TPOS.forEach(([x, z], i) => {
@@ -250,16 +242,12 @@
       hop(tl, p, dest, base + (i % 24) * 0.03, far ? 1.3 : 0.9, far ? 0.9 : 0.5);
     });
   };
-  R.relayout = function () {
-    R.students.forEach((p, i) => { const d = seatPos(i, R.studentMode); p.position.x = d.x; p.position.z = d.z; });
-    R.tables.forEach((t) => { const tp = tablePos(t.s, t.k); t.g.position.x = tp.x; t.g.position.z = tp.z; });
-  };
   R.setTeachers = (tl, on, at = 0) => pop(tl, R.teachers, on, at, 0.08);
 
   // ── 책상과 교구 ──────────────────────────────
   R.tables = [];
   R.rowDesks = [];
-  R.props = { picture: [], schedule: [], role: [], sticker: [], sheet: [], bins: [], laptops: [], choice: [], hp: [], tokens: [] };
+  R.props = { picture: [], schedule: [], role: [], sticker: [], sheet: [], bins: [], laptops: [], hp: [], tokens: [], tablets: [], counters: [] };
   const sheetTex = {};
   function makeSheetTex() {
     sheetTex.normal = W.canvasTex(256, 184, (c, w, h) => {
@@ -267,38 +255,23 @@
       c.fillStyle = '#B9B2A6';
       for (let i = 0; i < 6; i++) c.fillRect(22, 26 + i * 25, i % 2 ? 150 : 210, 6);
     }).tex;
-    sheetTex.contrast = W.canvasTex(256, 184, (c, w, h) => {
-      c.fillStyle = '#111111'; c.fillRect(0, 0, w, h);
-      c.fillStyle = '#FFE14D';
-      for (let i = 0; i < 4; i++) c.fillRect(18, 22 + i * 40, i % 2 ? 160 : 220, 16);
-    }).tex;
   }
-  function screenTex(kind) {
+  // 엔트리 화면: 왼쪽 블록, 오른쪽 실행 결과
+  function screenTex() {
     return W.canvasTex(512, 320, (c, w, h) => {
-      if (kind === 'code') {
-        c.fillStyle = '#1E2230'; c.fillRect(0, 0, w, h);
-        const rows = [['#E3B341', 150], ['#8FB3FF', 260], ['#C9CED6', 210], ['#8FB3FF', 300], ['#E3B341', 180], ['#C9CED6', 240], ['#8FB3FF', 120]];
-        rows.forEach(([col, len], i) => { c.fillStyle = col; c.fillRect(30 + (i % 3) * 22, 30 + i * 38, len, 14); });
-      } else if (kind === 'call') {
-        c.fillStyle = '#2B3442'; c.fillRect(0, 0, w, h);
-        c.fillStyle = '#F1DCC4'; c.beginPath(); c.arc(w / 2, 130, 52, 0, 7); c.fill();
-        c.fillStyle = '#7FA7B5'; c.beginPath(); c.ellipse(w / 2, 290, 110, 90, 0, 0, 7); c.fill();
-        c.fillStyle = '#E25B4B'; c.beginPath(); c.arc(w - 40, 34, 10, 0, 7); c.fill();
-      } else {   // 엔트리 화면: 왼쪽 블록, 오른쪽 실행 결과
-        c.fillStyle = '#FBFAF7'; c.fillRect(0, 0, w, h);
-        c.fillStyle = '#EEF1F4'; c.fillRect(0, 0, 250, h);
-        c.fillStyle = '#1B1A18'; c.fillRect(0, 0, w, 30);
-        [['#00B400', 0, 150], ['#19BAEA', 0, 170], ['#E457DC', 1, 190], ['#19BAEA', 1, 150], ['#E457DC', 2, 140], ['#E457DC', 2, 160], ['#19BAEA', 1, 70], ['#E457DC', 0, 180]]
-          .forEach(([col, ind, len], i) => { c.fillStyle = col; c.fillRect(18 + ind * 18, 46 + i * 32, len, 22); });
-        [[0.1, '#E3B341'], [0.3, '#C9CED6'], [0.6, '#B0703F']].forEach(([v, col], i) => {
-          c.fillStyle = col; c.fillRect(290 + i * 72, 290 - v * 300, 50, v * 300);
-        });
-        c.strokeStyle = '#213A63'; c.lineWidth = 3; c.setLineDash([8, 6]);
-        c.beginPath(); c.moveTo(270, 260); c.lineTo(w - 20, 260); c.stroke();
-      }
+      c.fillStyle = '#FBFAF7'; c.fillRect(0, 0, w, h);
+      c.fillStyle = '#EEF1F4'; c.fillRect(0, 0, 250, h);
+      c.fillStyle = '#1B1A18'; c.fillRect(0, 0, w, 30);
+      [['#00B400', 0, 150], ['#19BAEA', 0, 170], ['#E457DC', 1, 190], ['#19BAEA', 1, 150], ['#E457DC', 2, 140], ['#E457DC', 2, 160], ['#19BAEA', 1, 70], ['#E457DC', 0, 180]]
+        .forEach(([col, ind, len], i) => { c.fillStyle = col; c.fillRect(18 + ind * 18, 46 + i * 32, len, 22); });
+      [[0.1, '#E3B341'], [0.3, '#C9CED6'], [0.6, '#B0703F']].forEach(([v, col], i) => {
+        c.fillStyle = col; c.fillRect(290 + i * 72, 290 - v * 300, 50, v * 300);
+      });
+      c.strokeStyle = '#213A63'; c.lineWidth = 3; c.setLineDash([8, 6]);
+      c.beginPath(); c.moveTo(270, 260); c.lineTo(w - 20, 260); c.stroke();
     }).tex;
   }
-  function laptop(kind = 'sim') {
+  function laptop() {
     const g = new T.Group();
     const dark = mat(0x3A3D44, { roughness: 0.5, metalness: 0.3 });
     g.add(mesh(rbox(0.34, 0.018, 0.24, 0.008), dark, 0, 0.009, 0));
@@ -306,7 +279,7 @@
     hinge.position.set(0, 0.018, -0.12);
     hinge.rotation.x = -0.22;
     hinge.add(mesh(rbox(0.34, 0.22, 0.012, 0.008), dark, 0, 0.11, 0));
-    const scr = new T.MeshBasicMaterial({ map: screenTex(kind), toneMapped: false });
+    const scr = new T.MeshBasicMaterial({ map: screenTex(), toneMapped: false });
     const disp = new T.Mesh(new T.PlaneGeometry(0.31, 0.19), scr);
     disp.position.set(0, 0.11, 0.0065);
     hinge.add(disp);
@@ -327,6 +300,56 @@
       c.rotation.set(i * 1.3, i * 0.7, i * 2.1);
       g.add(c);
     }
+    return g;
+  }
+
+  // 절차 영상 태블릿: 스테이션마다 1대. 화면은 절차 영상의 한 장면 (모든 모둠은 교사 시범, 학생 A는 자기 모습)
+  let tabletTex = null, counterTex = null;   // 글꼴이 준비된 뒤(R.build) 그린다
+  const drawTablet = (c, w, h) => {
+    c.fillStyle = '#1D2128'; c.fillRect(0, 0, w, h);
+    c.fillStyle = '#9AA3B2'; c.font = W.font(22, 700); c.textAlign = 'left'; c.fillText('절차 영상', 16, 30);
+    c.fillStyle = '#F1DCC4'; c.beginPath(); c.arc(112, 88, 26, 0, 7); c.fill();
+    c.fillStyle = '#E2B677'; c.beginPath(); c.ellipse(112, 168, 42, 52, 0, 0, 7); c.fill();
+    c.fillStyle = '#F2EEE6'; c.beginPath(); c.arc(196, 140, 20, Math.PI, 0); c.fill();
+    c.fillStyle = '#7F9BAE'; c.beginPath(); c.arc(196, 140, 20, 0, Math.PI); c.fill();
+    c.fillStyle = 'rgba(255,255,255,.85)'; c.beginPath(); c.moveTo(262, 70); c.lineTo(262, 110); c.lineTo(294, 90); c.fill();
+    for (let i = 0; i < 5; i++) { c.fillStyle = i < 2 ? '#F3D37C' : 'rgba(255,255,255,.3)'; c.beginPath(); c.arc(120 + i * 22, 210, 6, 0, 7); c.fill(); }
+  };
+  function tablet() {
+    tabletTex = tabletTex || W.canvasTex(320, 224, drawTablet).tex;
+    const g = new T.Group();
+    const frame = glowMat(0x2C2F36, { roughness: 0.5 });
+    const body = new T.Group();
+    body.add(mesh(rbox(0.21, 0.15, 0.012, 0.008), frame, 0, 0, 0));
+    const scr = plane(tabletTex, 0.19, 0.133, true);
+    scr.position.z = 0.0065;
+    body.add(scr);
+    body.position.y = 0.07;
+    body.rotation.x = -0.35;
+    g.add(body, mesh(rbox(0.08, 0.012, 0.06, 0.004), mat(0x8C8984), 0, 0.006, -0.03, false));
+    g.userData.frame = frame;
+    return g;
+  }
+  // 횟수판: 진행자가 20번의 차례를 센다
+  const drawCounter = (c, w, h) => {
+    c.fillStyle = '#FFFFFF'; c.fillRect(0, 0, w, h);
+    c.fillStyle = '#213A63'; c.font = W.font(26, 900); c.textAlign = 'left'; c.fillText('횟수 20', 14, 32);
+    for (let i = 0; i < 20; i++) {
+      const x = 30 + (i % 5) * 48, y = 70 + Math.floor(i / 5) * 32;
+      c.strokeStyle = '#6F695F'; c.lineWidth = 3; c.beginPath(); c.arc(x, y, 11, 0, 7); c.stroke();
+      if (i < 13) { c.fillStyle = '#3C3A40'; c.beginPath(); c.arc(x, y, 7, 0, 7); c.fill(); }
+    }
+  };
+  function counter() {
+    counterTex = counterTex || W.canvasTex(256, 192, drawCounter).tex;
+    const g = new T.Group();
+    const m = glowMat(0xE9E4DA);
+    g.add(mesh(rbox(0.19, 0.012, 0.145, 0.005), m, 0, 0.006, 0));
+    const face = plane(counterTex, 0.17, 0.128);
+    face.rotation.x = -Math.PI / 2;
+    face.position.y = 0.0135;
+    g.add(face);
+    g.userData.frame = m;
     return g;
   }
 
@@ -424,6 +447,20 @@
         g.add(tg);
         P.token = tok; P.tokG = tg;
         R.props.tokens.push(tok);
+        const cnt = counter();
+        cnt.position.set(0.62, 0.75, -0.4);
+        cnt.rotation.y = 0.15;
+        g.add(cnt);
+        P.counter = cnt;
+        R.props.counters.push(cnt.userData.frame);
+      }
+      if (k === 0) {   // 절차 영상 태블릿 (스테이션마다 1대, 학생 A의 모둠 쪽 책상)
+        const tb = tablet();
+        tb.position.set(st === 2 ? 0.3 : 0.6, 0.75, st === 2 ? -0.12 : 0.04);
+        tb.rotation.y = Math.PI - 0.35;   // 화면이 학생 A 쪽(−z)을 본다
+        g.add(tb);
+        P.tablet = tb;
+        R.props.tablets.push(tb.userData.frame);
       }
       if (st === 2) {   // 정보: 노트북
         const l1 = laptop(); l1.position.set(-0.2, 0.75, -0.3); g.add(l1);
@@ -484,45 +521,57 @@
     });
   };
 
-  // ── 벽 게시판: 지원 카드 10장 ──────────────────
+  // ── 벽 게시판: 핵심 어휘 풀이 카드 (문구는 지도안 Ⅺ.6 표에서 읽는다) ──
   R.cards = [];
-  function drawCard(ctx, w, h, i, area, sel) {
-    ctx.fillStyle = sel ? '#213A63' : '#FBF8F1';
+  function wrap(ctx, text, maxW) {
+    const out = [];
+    let line = '';
+    for (const word of text.split(' ')) {
+      const t = line ? line + ' ' + word : word;
+      if (ctx.measureText(t).width > maxW && line) { out.push(line); line = word; } else line = t;
+    }
+    if (line) out.push(line);
+    return out;
+  }
+  function drawCard(ctx, w, h, row, sel) {
+    ctx.fillStyle = '#FBF8F1';
     ctx.fillRect(0, 0, w, h);
-    ctx.strokeStyle = sel ? '#F3D37C' : 'rgba(27,26,24,.25)';
+    ctx.fillStyle = sel ? '#F3D37C' : '#213A63';
+    ctx.fillRect(0, 0, w, 16);
+    ctx.strokeStyle = sel ? '#C8952A' : 'rgba(27,26,24,.25)';
     ctx.lineWidth = sel ? 10 : 3;
     ctx.strokeRect(5, 5, w - 10, h - 10);
-    ctx.fillStyle = sel ? '#F3D37C' : '#8A847A';
-    ctx.font = W.font(30, 700);
     ctx.textAlign = 'left';
-    ctx.fillText(String((i + 1) % 10), 22, 48);
-    ctx.fillStyle = sel ? '#FFFFFF' : '#1B1A18';
-    ctx.font = W.font(area.length > 5 ? 34 : 42, 900);
-    ctx.textAlign = 'center';
-    ctx.fillText(area, w / 2, h / 2 + 28);
+    ctx.fillStyle = '#213A63';
+    ctx.font = W.font(row.word.length > 4 ? 58 : 66, 900);
+    ctx.fillText(row.word, 34, 98);
+    ctx.fillStyle = '#1B1A18';
+    ctx.font = W.font(36, 700);
+    wrap(ctx, row.easy, w - 68).slice(0, 2).forEach((l, i) => ctx.fillText(l, 34, 168 + i * 48));
+    ctx.fillStyle = '#6F695F';
+    ctx.font = W.font(28, 500);
+    wrap(ctx, row.ex, w - 68).slice(0, 2).forEach((l, i) => ctx.fillText(l, 34, 288 + i * 38));
   }
   function buildWall(s, rows) {
     s.add(mesh(rbox(0.05, 1.32, 3.95, 0.02), mat(0xC4A57A, { roughness: 1 }), -3.725, 1.75, 0));
-    rows.slice(0, 10).forEach((r, i) => {
-      const area = r.area.replace(/\(.*\)/, '').trim();
-      const ct = W.canvasTex(320, 220, (c, w, h) => drawCard(c, w, h, i, area, false));
+    rows.slice(0, 8).forEach((r, i) => {
+      const top = i < 4, n = top ? Math.min(4, rows.length) : Math.min(4, rows.length - 4), k = top ? i : i - 4;
+      const ct = W.canvasTex(512, 360, (c, w, h) => drawCard(c, w, h, r, false));
       const m = new T.MeshStandardMaterial({ map: ct.tex, roughness: 0.9 });
-      const pl = mesh(new T.PlaneGeometry(0.66, 0.454), m, -3.695, i < 5 ? 2.03 : 1.47, 1.52 - (i % 5) * 0.76, false);
+      const pl = mesh(new T.PlaneGeometry(0.82, 0.577), m, -3.695, top ? 2.06 : 1.44, ((n - 1) / 2 - k) * 0.92, false);
       pl.rotation.y = Math.PI / 2;
       s.add(pl);
-      R.cards.push({ pl, ct, area, i, home: pl.position.clone() });
+      R.cards.push({ pl, ct, row: r, home: pl.position.clone() });
     });
   }
-  R.wallShimmer = function (tl, at = 0) {
-    tl.to(R.cards.map((c) => c.pl.position), { x: '+=0.06', duration: 0.18, yoyo: true, repeat: 1, stagger: 0.05, ease: 'sine.inOut' }, at);
-  };
-  function selectCard(tl, i, on, at) {
-    const c = R.cards[i];
+  // 하나를 골라 앞으로 꺼낸다 (발표에서는 '상대도수')
+  function selectCard(tl, c, on, at) {
     if (!c) return;
-    tl.call(() => c.ct.draw((cx, w, h) => drawCard(cx, w, h, i, c.area, on)), null, at);
-    tl.to(c.pl.position, { x: c.home.x + (on ? 0.14 : 0), duration: 0.45, ease: 'back.out(2)' }, at);
-    tl.to(c.pl.scale, { x: on ? 1.12 : 1, y: on ? 1.12 : 1, duration: 0.45, ease: 'back.out(2)' }, at);
+    tl.call(() => c.ct.draw((cx, w, h) => drawCard(cx, w, h, c.row, on)), null, at);
+    tl.to(c.pl.position, { x: c.home.x + (on ? 0.16 : 0), duration: 0.45, ease: 'back.out(2)' }, at);
+    tl.to(c.pl.scale, { x: on ? 1.14 : 1, y: on ? 1.14 : 1, duration: 0.45, ease: 'back.out(2)' }, at);
   }
+  const focusCard = () => R.cards.find((c) => c.row.word === '상대도수') || R.cards[0];
 
   // ── Bruner 3층: 같은 20번의 결과를 세 가지 표상으로 ─────
   R.layerPlanes = [];
@@ -630,218 +679,39 @@
     });
   };
 
-  // ── 카드를 바꾸면 교실이 바뀐다 ────────────────
-  const MOD = R.MOD = [];
-  function poster(lines, w = 512, h = 384, bg = '#FBF8F1', ink = '#1B1A18') {
-    return W.canvasTex(w, h, (c) => {
-      c.fillStyle = bg; c.fillRect(0, 0, w, h);
-      lines.forEach((l, i) => {
-        c.fillStyle = i === 0 ? '#213A63' : ink;
-        c.font = W.font(i === 0 ? 44 : 38, i === 0 ? 900 : 500);
-        c.fillText(l, 34, 70 + i * 72);
-      });
-    }).tex;
-  }
   function plane(tex, w, h, basic = false) {
     const m = basic ? new T.MeshBasicMaterial({ map: tex, toneMapped: false }) : new T.MeshStandardMaterial({ map: tex, roughness: 0.9 });
     return new T.Mesh(new T.PlaneGeometry(w, h), m);
   }
-  function buildMods(s) {
-    const add = (o) => { s.add(hidden(o)); return o; };
-    const onTables = (st, make) => R.tables.filter((t) => st === null || t.s === st).map((t) => { const o = make(t); t.g.add(hidden(o)); return o; });
 
-    // 0 지적장애: 그림 단서와 스티커 그래프가 빛난다
-    MOD[0] = { glow: () => [...R.props.picture, ...R.props.sticker] };
-    // 1 자폐성장애: 일과표 · 헤드폰 · 조용한 자리 (교실 뒤 책상 하나에 접이식 칸막이를 세운다. 공사 없이 꺼내 쓰는 물건)
-    const quiet = new T.Group();
-    const part = mat(0xC9D3DA);
-    quiet.add(mesh(rbox(0.62, 0.04, 0.44, 0.015), mat(C.wood), 0, 0.66, 0), mesh(rbox(0.56, 0.1, 0.38, 0.01), mat(C.woodDark), 0, 0.59, 0));
-    [-0.28, 0.28].forEach((x) => quiet.add(mesh(new T.BoxGeometry(0.03, 0.64, 0.36), mat(0x8C8984, { roughness: 0.5, metalness: 0.4 }), x, 0.32, 0)));
-    quiet.add(mesh(rbox(0.6, 0.4, 0.015, 0.006), part, 0, 0.88, -0.21));
-    [-1, 1].forEach((k) => { const w = mesh(rbox(0.015, 0.4, 0.4, 0.006), part, k * 0.3, 0.88, -0.02); w.rotation.y = k * 0.25; quiet.add(w); });
-    quiet.add(mesh(rbox(0.4, 0.04, 0.36, 0.02), mat(0x9DB0C4), 0, 0.42, 0.42), mesh(rbox(0.4, 0.4, 0.04, 0.02), mat(0x9DB0C4), 0, 0.62, 0.6));
-    quiet.position.set(-3.0, 0, -3.8);
-    MOD[1] = { objs: [add(quiet)], glow: () => [...R.props.schedule, ...R.props.hp] };
-    // 2 학습장애: 계산기 · 읽어 주기 스피커
-    const calcs = onTables(1, () => {
-      const g = new T.Group();
-      g.add(mesh(rbox(0.11, 0.018, 0.16, 0.006), glowMat(0x2C2F36), 0, 0.009, 0));
-      g.add(mesh(new T.BoxGeometry(0.08, 0.004, 0.04), mat(0xB8D8C0), 0, 0.02, -0.045, false));
-      g.position.set(0.68, 0.75, 0.25);
-      return g;
-    });
-    // 읽어 주기 펜 + 이어폰 (스피커는 교실에 소리를 퍼뜨리므로 쓰지 않는다)
-    const spk = onTables(null, () => {
-      const g = new T.Group();
-      const pen = mesh(new T.CylinderGeometry(0.012, 0.008, 0.15, 12), glowMat(0x2C2F36), 0, 0.012, 0);
-      pen.rotation.z = Math.PI / 2;
-      g.add(pen);
-      const bud = mat(0xF3F1EC, { roughness: 0.4 });
-      g.add(mesh(new T.SphereGeometry(0.012, 10, 8), bud, -0.03, 0.012, 0.05), mesh(new T.SphereGeometry(0.012, 10, 8), bud, 0.0, 0.012, 0.06));
-      g.position.set(-0.36, 0.75, 0.1);
-      return g;
-    });
-    MOD[2] = { objs: [...calcs, ...spk], glow: () => [...calcs, ...spk].map((g) => g.children[0].material) };
-    // 3 정서·행동장애: 기대행동 게시물 · 쉼 자리 (교실 뒤 의자 하나와 깔개. 휴식 카드를 들고 와서 3분 쉰다)
-    const calm = new T.Group();
-    calm.add(mesh(new T.CylinderGeometry(0.62, 0.62, 0.02, 40), mat(0xB9C7B0, { roughness: 1 }), 0, 0.034, 0, false));
-    const seat = mat(0x8FA58A, { roughness: 0.9 });
-    calm.add(mesh(rbox(0.42, 0.05, 0.4, 0.02), seat, 0.05, 0.44, 0.05), mesh(rbox(0.42, 0.42, 0.05, 0.02), seat, 0.05, 0.66, 0.26));
-    [[-0.13, -0.12], [0.23, -0.12], [-0.13, 0.22], [0.23, 0.22]].forEach(([x, z]) => calm.add(mesh(new T.CylinderGeometry(0.018, 0.018, 0.42, 8), mat(0x8C8984), x, 0.21, z)));
-    calm.add(mesh(rbox(0.12, 0.012, 0.08, 0.004), glowMat(0xE58C6A), 0.05, 0.475, 0.0, false));   // 휴식 카드
-    calm.position.set(-3.0, 0, -3.75);   // 교실 뒤 모퉁이 (조용한 자리와 같은 곳: 두 카드는 동시에 켜지지 않는다)
-    const rules = plane(poster(['기대행동 3가지', '1  차례 지키기', '2  역할 지키기', '3  도움 카드 들기']), 1.0, 0.75);
-    rules.position.set(-3.73, 1.75, -2.85);
-    rules.rotation.y = Math.PI / 2;
-    MOD[3] = { objs: [add(calm), add(rules)] };
-    // 4 시각장애: 토큰은 겉모양이 같은 캡슐 안에 있다 (손으로 골라 뽑을 수 없게). 캡슐을 연 뒤 토큰의 촉각 점(금 1 · 은 2 · 동 3)을 범례판에 대 보고 색을 안다. 활동지는 고대비로.
-    const legends = onTables(1, () => {
-      const g = new T.Group();
-      g.add(mesh(rbox(0.17, 0.014, 0.24, 0.005), glowMat(0x1B1A18), 0, 0.007, 0));
-      const dot = new T.SphereGeometry(0.011, 10, 8);
-      [[D.RARITY.g.hex, 1], [D.RARITY.s.hex, 2], [D.RARITY.b.hex, 3]].forEach(([c, n], row) => {
-        const m = mat(c, { roughness: 0.5 });
-        for (let j = 0; j < n; j++) g.add(mesh(dot, m, -0.045 + j * 0.035, 0.016, -0.07 + row * 0.07, false));
-      });
-      g.position.set(0.66, 0.75, 0.22);
-      return g;
-    });
-    MOD[4] = {
-      objs: legends,
-      glow: () => legends.map((g) => g.children[0].material),
-      on(tl, at) { flipSheets(tl, 'contrast', at); },
-      off(tl, at) { flipSheets(tl, 'normal', at); },
-    };
-    // 5 청각장애: 설치 공사 없이 모둠이 들고 다니는 한 세트. 자막 태블릿 · 마이크 2개(교사용, 돌려 쓰는 발언용) · 빛 타이머
-    const kit = new T.Group();
-    const capT = W.canvasTex(320, 200, (c, w, h) => {
-      c.fillStyle = '#16181D'; c.fillRect(0, 0, w, h);
-      c.fillStyle = '#9AA3B2'; c.font = W.font(20, 700); c.fillText('실시간 자막', 18, 32);
-      c.fillStyle = '#FFFFFF'; c.font = W.font(26, 500);
-      ['스무 번 중에 금색은', '몇 번 나왔나요?', '두 번 나왔어요'].forEach((t, i) => c.fillText(t, 18, 84 + i * 40));
-    }).tex;
-    const tab = new T.Group();
-    tab.add(mesh(rbox(0.21, 0.15, 0.012, 0.008), mat(0x2C2F36, { roughness: 0.5 }), 0, 0, 0));
-    const scr = plane(capT, 0.19, 0.13, true);
-    scr.position.z = 0.0065;
-    tab.add(scr);
-    tab.position.set(0.05, 0.75 + 0.07, -0.06);
-    tab.rotation.x = -0.35;
-    kit.add(tab);
-    const micM = glowMat(0x2C2F36, { roughness: 0.4, metalness: 0.3 });
-    [[-0.3, 0.02, 0.4], [-0.3, -0.06, -0.3]].forEach(([x, z, ry]) => {   // 손에 드는 발언 마이크 · 교사용 핀 마이크(작은 것)
-      const m = new T.Group();
-      m.add(mesh(new T.CylinderGeometry(0.012, 0.009, 0.1, 12), micM, 0, 0, 0));
-      m.add(mesh(new T.SphereGeometry(0.019, 12, 10), mat(0x8C8984, { roughness: 0.6 }), 0, 0.058, 0));
-      m.rotation.set(0, ry, Math.PI / 2);
-      m.position.set(x, 0.765, z);
-      kit.add(m);
-    });
-    const lampM = mat(0x5A4A20, { emissive: new T.Color(0xFFD45A), emissiveIntensity: 0 });
-    const timer = new T.Group();
-    timer.add(mesh(rbox(0.09, 0.07, 0.07, 0.015), mat(0xE9E4DA), 0, 0.035, 0), mesh(rbox(0.07, 0.05, 0.01, 0.01), lampM, 0, 0.038, 0.036, false));
-    timer.position.set(-0.3, 0.75, -0.2);
-    kit.add(timer);
-    R.tableAt(1, 0).g.add(hidden(kit));
-    MOD[5] = { objs: [kit], glow: () => [micM], lamp: lampM };
-    W.onFrame((dt, t) => { lampM.emissiveIntensity = R.card === 5 ? (Math.sin(t * 5) > 0 ? 2.2 : 0.2) : 0; });
-    // 6 지체장애: 넓어진 동선 · 바닥의 휠체어 동선 표시
-    const tape = new T.Group();
-    const tm = mat(C.navy, { roughness: 0.8 });
-    const seg = (x1, z1, x2, z2) => {
-      const len = Math.hypot(x2 - x1, z2 - z1), n = Math.floor(len / 0.5);
-      for (let i = 0; i < n; i++) {
-        const t0 = (i + 0.25) / n;
-        const m = mesh(new T.BoxGeometry(0.28, 0.012, 0.09), tm, x1 + (x2 - x1) * t0, 0.03, z1 + (z2 - z1) * t0, false);
-        m.rotation.y = -Math.atan2(z2 - z1, x2 - x1);
-        tape.add(m);
-      }
-    };
-    seg(-3.5, 4.2, 3.5, 4.2); seg(-1.25, 4.2, -1.25, -2.35); seg(1.25, 4.2, 1.25, -2.35); seg(-3.5, -2.35, 3.5, -2.35);
-    MOD[6] = {
-      objs: [add(tape)],
-      on(tl, at) { tl.to(R, { spread: 1, duration: 1.2, ease: 'power2.inOut', onUpdate: R.relayout }, at); },
-      off(tl, at) { tl.to(R, { spread: 0, duration: 0.9, ease: 'power2.inOut', onUpdate: R.relayout }, at); },
-    };
-    // 7 건강장애: 모둠 노트북 화상 연결 (원격으로 참여하는 친구가 기록을 맡는다)
-    const call = laptop('call');
-    call.position.set(0.62, 0.75, 0.05);
-    call.rotation.y = Math.PI / 2;
-    R.tableAt(0, 0).g.add(hidden(call));
-    MOD[7] = { objs: [call] };
-    // 8 다문화: 핵심 어휘 이중언어 카드
-    const words = [
-      ['기회비용', 'opportunity cost', '机会成本'],
-      ['확률', 'probability', 'xác suất'],
-      ['상대도수', 'relative frequency', '相对频率'],
-    ].map((w, i) => {
-      const p = plane(poster(w, 512, 256), 0.66, 0.33);
-      p.position.set(2.95, 2.35 - i * 0.42, -4.48);
-      return add(p);
-    });
-    MOD[8] = { objs: words, glow: () => R.props.picture };
-    // 9 영재: 심화 과제 카드 · 코드 화면
-    const chal = onTables(2, () => mesh(rbox(0.2, 0.012, 0.14, 0.004), glowMat(0xE3B341, { metalness: 0.3, roughness: 0.4 }), -0.62, 0.757, 0.0, false));
-    const codeTex = screenTex('code');
-    MOD[9] = {
-      objs: chal,
-      glow: () => chal.map((m) => m.material),
-      on(tl, at) { tl.call(() => R.props.laptops.forEach((l) => { l.userData.prev = l.userData.screen.map; l.userData.screen.map = codeTex; }), null, at + 0.2); },
-      off(tl, at) { tl.call(() => R.props.laptops.forEach((l) => { if (l.userData.prev) l.userData.screen.map = l.userData.prev; }), null, at); },
-    };
-  }
-  function flipSheets(tl, kind, at) {
-    const sh = R.props.sheet;
-    tl.to(sh.map((s) => s.scale), { x: 0.001, duration: 0.2, ease: 'power1.in' }, at);
-    tl.call(() => sh.forEach((s) => { s.material.map = sheetTex[kind]; s.material.needsUpdate = true; }), null, at + 0.2);
-    tl.to(sh.map((s) => s.scale), { x: 1, duration: 0.25, ease: 'power1.out' }, at + 0.2);
-  }
-
-  R.card = null;
-  R.setCard = function (tl, idx, prev, atA = 0, atC = 0) {
-    if (idx === prev) return;
-    if (prev != null && MOD[prev]) {
-      const m = MOD[prev];
-      if (m.objs) pop(tl, m.objs, false, atA);
-      if (m.glow) R.glow(tl, m.glow(), false, atA);
-      if (m.off) m.off(tl, atA);
-      selectCard(tl, prev, false, atA);
-    }
-    R.card = idx;
-    if (idx != null && MOD[idx]) {
-      const m = MOD[idx];
-      selectCard(tl, idx, true, atC);
-      if (m.objs) pop(tl, m.objs, true, atC + 0.2, 0.04);
-      if (m.glow) R.glow(tl, m.glow(), true, atC + 0.2);
-      if (m.on) m.on(tl, atC + 0.2);
-    }
-  };
-
-  // ── 세 개의 렌즈: A → B → 모두 ────────────────
+  // ── 렌즈: 지원 도구만 빛나게 하고 교실은 낮춘다 ─────────
+  //   lead  수학 스테이션에서 학생 A의 역할 (진행자 + 절차 영상)
+  //   A     정보 스테이션에서 학생 A를 위한 지원
+  //   all   같은 도구가 처음부터 모든 모둠에 있었다
+  //   vocab 벽의 어휘 카드 하나를 꺼낸다 (교실은 낮추지 않는다)
   function lensMats(l) {
-    const a = R.tableAt(1, 0), b = R.tableAt(2, 0);   // 순환 뒤 A 는 수학, B 는 정보 책상
-    if (l === 'A') return [a.picture, a.sticker, a.token];
-    if (l === 'B') return [b.schedule[0], R.mat_hp, b.role[1]];
-    if (l === 'all') return [...R.props.picture, ...R.props.schedule, ...R.props.role, ...R.props.sticker, ...R.props.tokens, ...R.props.hp];
+    const m = R.tableAt(1, 0), f = R.tableAt(2, 0);   // 학생 A: 수학(모둠 시작) → 정보(순환 뒤), 둘 다 k = 0 책상
+    if (l === 'lead') return [m.tablet.userData.frame, m.counter.userData.frame, m.role[1]];
+    if (l === 'A') return [f.tablet.userData.frame, f.role[1], f.schedule[0]];
+    if (l === 'all') return [...R.props.picture, ...R.props.schedule, ...R.props.role, ...R.props.sticker, ...R.props.tokens, ...R.props.hp, ...R.props.tablets, ...R.props.counters];
     return [];
   }
-  const LENS_PINS = { A: ['lp-pic', 'lp-stk', 'lp-tok'], B: ['lp-sch', 'lp-hp', 'lp-role'], all: [] };
+  const LENS_PINS = { lead: ['tag-A', 'lp-tab1', 'lp-cnt'], A: ['tag-A', 'lp-tab2', 'lp-scr', 'lp-sch'], all: [], vocab: [] };
   R.lens = null;
   R.setLens = function (tl, l, prev, atA = 0, atC = 0) {
     if (l === prev) return;
     if (prev) {
       R.glow(tl, lensMats(prev), false, atA);
-      W.pinTo(tl, 'tag-' + prev, false, atA);
       LENS_PINS[prev].forEach((id) => W.pinTo(tl, id, false, atA));
-      if (prev === 'B') pop(tl, R.hpB, false, atA);
+      if (prev === 'vocab') selectCard(tl, focusCard(), false, atA);
     }
     R.lens = l;
-    W.dimTo(tl, l ? 1 : 0, { at: l ? atC : atA });
+    const dim = l && l !== 'vocab';
+    W.dimTo(tl, dim ? 1 : 0, { at: dim ? atC : atA });
     if (l) {
-      if (l === 'B') pop(tl, R.hpB, true, atC);
       R.glow(tl, lensMats(l), true, atC + 0.2);
-      if (l !== 'all') W.pinTo(tl, 'tag-' + l, true, atC + 0.3);
-      LENS_PINS[l].forEach((id, i) => W.pinTo(tl, id, true, atC + 0.5 + i * 0.12));
+      LENS_PINS[l].forEach((id, i) => W.pinTo(tl, id, true, atC + 0.3 + i * 0.12));
+      if (l === 'vocab') selectCard(tl, focusCard(), true, atC);
     }
   };
 
@@ -849,31 +719,28 @@
   function buildPins() {
     const head = (p, dy = 0.32) => (v) => v.set(p.position.x, p.position.y + p.userData.headY + dy, p.position.z);
     W.addPin('tag-A', '학생 A', head(R.students[R.A]), 'pin-tag');
-    W.addPin('tag-B', '학생 B', head(R.students[R.B]), 'pin-tag');
     ['T1 사회', 'T2 수학', 'T3 정보', 'T4 특수교사'].forEach((t, i) =>
       W.addPin('t' + (i + 1), t, head(R.teachers[i], 0.3), i === 3 ? 'pin-teacher pin-t4' : 'pin-teacher'));
-    STATION.forEach((n, i) => W.addPin('st' + i, `${n} 스테이션`, (v) => v.set(SX[i] * (1 + 0.12 * R.spread), 0.05, 3.62), 'pin-station'));
-    // 렌즈 A · B 에서 빛나는 지원 도구의 이름 (색만으로 구분하지 않게)
-    const a = R.tableAt(1, 0), b = R.tableAt(2, 0);
+    STATION.forEach((n, i) => W.addPin('st' + i, `${n} 스테이션`, (v) => v.set(SX[i], 0.05, 3.62), 'pin-station'));
+    // 렌즈에서 빛나는 지원 도구의 이름 (색만으로 구분하지 않게)
+    const m = R.tableAt(1, 0), f = R.tableAt(2, 0);
     const on = (o, dy = 0.08) => (v) => { o.getWorldPosition(v); v.y += dy; return v; };
-    W.addPin('lp-pic', '그림 카드', on(a.picG, 0.06), 'pin-prop');
-    W.addPin('lp-stk', '스티커 그래프', on(a.sb, 0.36), 'pin-prop');
-    W.addPin('lp-tok', '토큰 쌓기', on(a.tokG, 0.14), 'pin-prop');
-    W.addPin('lp-sch', '개별 일과표', on(b.schG, 0.3), 'pin-prop');
-    W.addPin('lp-hp', '헤드폰 (필요할 때)', on(R.hpB, 0), 'pin-prop pin-side');   // 머리 위 이름표와 겹치지 않게 머리 옆에
-    W.addPin('lp-role', '역할 카드', on(b.roleMesh[1], 0.06), 'pin-prop');
+    W.addPin('lp-tab1', '절차 영상 (자기 모습)', on(m.tablet, 0.24), 'pin-prop');
+    W.addPin('lp-cnt', '횟수판 20칸', on(m.counter, 0.06), 'pin-prop pin-side');
+    W.addPin('lp-tab2', '절차 영상 (4단계)', on(f.tablet, 0.24), 'pin-prop');
+    W.addPin('lp-scr', '스크립트 카드', on(f.roleMesh[1], 0.06), 'pin-prop pin-side');
+    W.addPin('lp-sch', '개별 일과표', on(f.schG, 0.3), 'pin-prop');
   }
 
-  R.build = function (cardRows) {
+  R.build = function (vocabRows) {
     const s = W.scene;
     buildRoom(s);
     buildBoard(s);
     buildTables(s);
     buildPeople(s);
     buildZones(s);
-    buildWall(s, cardRows);
+    buildWall(s, vocabRows);
     buildLayers(s);
-    buildMods(s);
     buildPins();
   };
 })();

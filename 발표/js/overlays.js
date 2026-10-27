@@ -131,7 +131,7 @@
   });
 
   // ── 교실 물건의 문법: 인쇄된 것(교사가 만든 것)과 손글씨(학생이 채운 것)를 나눈다 ──
-  // 점토 인형 그림: 3D 교실의 학생 말과 같은 색 (A·B 는 겉모습이 다른 학생과 같다)
+  // 점토 인형 그림: 3D 교실의 학생 말과 같은 색 (학생 A는 겉모습이 다른 학생과 같다)
   const SKIN = '#F1DCC4';
   const pawn = (body, x = 30, hp = false) => `<g transform="translate(${x - 30} 0)">
     <ellipse cx="30" cy="77" rx="17" ry="3" fill="rgba(0,0,0,.12)"/>
@@ -140,9 +140,7 @@
     ${hp ? '<path d="M15.5 22 A14.5 14.5 0 0 1 44.5 22" stroke="#2C2F36" stroke-width="3.2" fill="none"/><rect x="11" y="17" width="7" height="11" rx="2.5" fill="#2C2F36"/><rect x="42" y="17" width="7" height="11" rx="2.5" fill="#2C2F36"/>' : ''}</g>`;
   const PAWN = {
     A: `<svg viewBox="0 0 60 82">${pawn('#E2B677')}</svg>`,
-    B: `<svg viewBox="0 0 60 82">${pawn('#7FA7B5')}</svg>`,
-    Bhp: `<svg viewBox="0 0 60 82">${pawn('#7FA7B5', 30, true)}</svg>`,   // 학생 B를 위한 지원: 필요할 때 쓰는 헤드폰
-    all: `<svg viewBox="0 0 110 82">${pawn('#D98C6B', 22)}${pawn('#E2B677', 55)}${pawn('#7FA7B5', 88, true)}</svg>`,
+    all: `<svg viewBox="0 0 110 82">${pawn('#D98C6B', 22)}${pawn('#E2B677', 55)}${pawn('#7FA7B5', 88, true)}</svg>`,   // 헤드폰은 필요한 사람 누구나
   };
   // 손글씨가 써지는 모습: 왼쪽에서 오른쪽으로 드러난다
   const write = (tl, els, at, stagger = 0.18) =>
@@ -159,24 +157,6 @@
     }
     return out;
   };
-
-  // ── 학생 A · B 소개: 학생 기록 카드 (지도안 Ⅳ.2) ───────
-  const PROFILE = [
-    { k: 'A', who: '학생 A', type: '지적장애(경도)', f: [['배치', '특수학급 소속, 이 시간만 통합'], ['강점', '그림이 있으면 이해가 빠름, 1,000원으로 매점에서 혼자 산다'], ['어려움', '여러 단계로 된 지시, 긴 글']] },
-    { k: 'B', who: '학생 B', type: '자폐성장애', f: [['배치', '일반학급, 지적 기능은 평균 범위'], ['강점', '규칙·패턴 찾기, 컴퓨터 조작'], ['어려움', '예고 없는 전환, 큰 소음']] },
-  ];
-  def('intro', {
-    html: () => `<div><div class="pf-row">${PROFILE.map((p) => `<div class="rc">
-      <i class="clip"></i>
-      <div class="rc-top"><span>학생 기록 카드</span><span>2학년 ○반</span></div>
-      <div class="rc-main"><div class="rc-photo">${PAWN[p.k]}</div>
-        <div class="rc-f"><div class="nm"><b>${p.who}</b><span>${p.type}</span></div>
-          <dl>${p.f.map(([t, d]) => `<dt>${t}</dt><dd>${d}</dd>`).join('')}</dl></div></div></div>`).join('')}</div></div>`,
-    enter(tl, at) {
-      tl.fromTo(this.qa('.rc'), { y: 60, rotation: (i) => (i ? 2.5 : -2.5), opacity: 0 },
-        { y: 0, rotation: (i) => (i ? 0.6 : -0.6), opacity: 1, duration: 0.7, stagger: 0.18, ease: 'power3.out' }, at);
-    },
-  });
 
   // ── 사회 스테이션: 비용·편익 활동지 ─────────────────
   def('social', {
@@ -442,33 +422,189 @@
   });
   const fnt = (px, w) => `${w} ${px}px "Noto Sans KR", sans-serif`;
 
-  // ── 지원 안내 띠: 학생 기록 카드에 이어 붙는 지원 메모 (학생 A → 학생 B → 모두) ──
-  const SUPPORT = {
-    A: { who: '학생 A를 위한 지원', what: '그림 카드, 스티커 그래프, 토큰 쌓기로 같은 활동에 참여합니다. 목표는 기본교육과정의 "놀이로 가능성을 경험한다"', std: '[9수학05-04]' },
-    B: { who: '학생 B를 위한 지원', what: '개별 일과표와 할 말을 적은 역할 카드. 헤드폰은 시끄러울 때 스스로 골라 씁니다. 미리 예고한 시연 역할로 "또래에게 결과 설명하기"를 연습합니다', std: '강의록 자폐성장애' },
-    all: { who: '모두를 위한 지원', what: '같은 지원이 처음부터 모든 모둠의 책상에 놓여 있었습니다. 헤드폰도 필요한 사람 누구나 씁니다. 그래서 눈에 띄지 않습니다', std: 'UDL · 통합교육 4대 원리 ②' },
-  };
-  def('lens', {
-    html: () => `<div><div class="cap-strip rc"><i class="clip"></i><div class="cap-in"></div></div></div>`,
-    enter(tl, at) { tl.fromTo(this.q('.cap-strip'), { y: 40, rotation: -1, opacity: 0 }, { y: 0, rotation: -0.3, opacity: 1, duration: 0.6, ease: 'power3.out' }, at); },
-    mode(tl, m, prev, at) {
-      const L = SUPPORT[m];
-      swap(tl, this.q('.cap-in'), `<div class="rc-photo${m === 'all' ? ' wide' : ''}">${PAWN[m === 'B' ? 'Bhp' : m]}</div>
-        <div><div class="who">${L.who}</div><div class="what">${L.what}</div><div class="std">근거 · ${L.std}</div></div>`, at, prev === undefined);
+  // ── 탭이 달린 종이: 같은 자리의 본문만 바뀌고, 탭이 지금 위치를 알려 준다 (학생 기록 카드 · 연구 노트) ──
+  // 본문은 탭마다 미리 그려 두고 보이는 것만 바꾼다 (본문 안의 그래프도 처음부터 애니메이션 대상이 된다)
+  const tabs = (list) => `<div class="tabs">${list.map(([k, t]) => `<span data-k="${k}">${t}</span>`).join('')}</div>`;
+  const panes = (BODY) => `<div class="tab-body">${Object.entries(BODY).map(([k, h]) => `<div class="pane" data-k="${k}">${h}</div>`).join('')}</div>`;
+  function tabMode(s, tl, m, prev, at) {
+    const nu = s.q(`.pane[data-k="${m}"]`), old = prev != null && s.q(`.pane[data-k="${prev}"]`);
+    let t = at;
+    if (prev === undefined) tl.set(s.qa('.pane'), { display: 'none', opacity: 0 }, at);
+    if (old) {
+      tl.to(old, { opacity: 0, y: -6, duration: 0.25, ease: 'power1.in' }, at);
+      tl.set(old, { display: 'none' }, at + 0.26);
+      t = at + 0.28;
+    }
+    tl.call(() => s.qa('.tabs span').forEach((e) => e.classList.toggle('on', e.dataset.k === m)), null, t);
+    tl.set(nu, { display: 'block' }, t);
+    tl.fromTo(nu, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.45, ease: 'power2.out' }, t);
+    if (s.after) s.after(tl, m, t + 0.2);
+  }
+  const li = (arr) => `<ul class="bul">${arr.map((x) => `<li>${x}</li>`).join('')}</ul>`;
+  const chip = (t, c = '') => `<i class="chip ${c}">${t}</i>`;
+
+  // ── 이 수업이 기르는 역량 (지도안 Ⅲ.3) ─────────────
+  const COMP = [
+    ['지식정보처리', '직접 뽑은 결과와 1,000번 데이터로 "5배면 이득"을 검증한다', '수학 · 정보'],
+    ['창의적 사고', '확률 · 시뮬레이션 · 기회비용을 묶어 "할까, 말까"를 판단한다', '융합'],
+    ['협력적 소통', '역할 카드로 모둠 데이터를 함께 만들고 근거를 들어 말한다', '모둠'],
+    ['공동체', '서로의 강점으로 기여한다. 학생 A는 진행자로 모둠 데이터를 지킨다', '통합'],
+    ['자기관리', '자기 소비를 스스로 결정하고 자기점검표로 돌아본다', '정리'],
+  ];
+  const SUBJ = [['수학', '정보처리 · 추론 · 연결'], ['정보', '컴퓨팅 사고력 · 디지털 문화 소양'], ['사회', '의사 결정력 · 비판적 사고력']];
+  def('comp', {
+    html: () => `<div><div class="sheet ws-comp">
+      <div class="sh-top"><span>지도안 Ⅲ.3</span><span>총론 Ⅰ.2 · 교과 역량</span></div>
+      <h3>이 수업이 기르는 역량</h3>
+      <div class="cp-grp">핵심역량</div>
+      ${COMP.map(([k, d, w]) => `<div class="cp-row"><b>${k}</b><span>${d}</span>${chip(w)}</div>`).join('')}
+      <div class="cp-grp">교과 역량</div>
+      <div class="cp-subj">${SUBJ.map(([k, d]) => `<div><b>${k}</b><span>${d}</span></div>`).join('')}</div>
+      <div class="cp-foot"><div><b>기초소양</b> 수리 · 디지털 · 언어 (어휘 풀이 카드)</div>
+        <div class="cp-a"><b>학생 A</b> 기본교육과정: 자율생활 · 대인관계 · 정보처리 · 연결</div></div></div></div>`,
+    enter(tl, at) {
+      tl.fromTo(this.q('.sheet'), { x: 50, rotation: 2, opacity: 0 }, { x: 0, rotation: 0.5, opacity: 1, duration: 0.7, ease: 'power3.out' }, at);
+      tl.fromTo(this.qa('.cp-row, .cp-subj > div, .cp-foot > div'), { opacity: 0, x: 14 }, { opacity: 1, x: 0, duration: 0.4, stagger: 0.09 }, at + 0.5);
     },
   });
 
-  // ── 지원 카드: 벽 게시판의 그 카드가 뽑혀 나와 펼쳐진다 (문구는 지도안 Ⅹ.1 표에서 읽는다) ──
-  def('card', {
-    html: () => `<div><div class="card-strip"><div class="card-in"></div></div></div>`,
-    enter(tl, at) { tl.fromTo(this.q('.card-strip'), { x: -60, rotation: -2, opacity: 0 }, { x: 0, rotation: 0, opacity: 1, duration: 0.6, ease: 'power3.out' }, at); },
-    mode(tl, idx, prev, at) {
-      const row = (D.cardRows || [])[idx] || { area: '', support: '', basis: '' };
-      const sc = (D.supportCards || [])[idx] || {};
-      const html = `<div class="card-face"><span class="no">${(idx + 1) % 10}</span><b class="${row.area.replace(/\(.*\)/, '').trim().length > 5 ? 'long' : ''}">${row.area.replace(/\(.*\)/, '').trim()}</b><span class="of">지원 카드 ${idx + 1} / 10</span></div>
-        <div class="card-back"><div class="lbl">본시에서의 추가 지원</div><div class="c-m">${row.support}</div>
-          <div class="lbl">교실에서 바뀐 것</div><div class="chg">${sc.change || ''}</div><div class="src">근거 · ${row.basis}</div></div>`;
-      swap(tl, this.q('.card-in'), html, at, prev === undefined);
+  // ── 학생 A: 학생 기록 카드 (지도안 Ⅳ.2) ──────────────
+  const PF_BODY = {
+    who: `<div class="tb-h">특성</div>${li([
+      '그림 · 영상 같은 <b>시각 정보는 빨리 이해</b>한다',
+      '말로 된 <b>여러 단계 지시는 놓친다</b>',
+      '같은 순서와 규칙을 좋아하고, <b>정해진 절차가 있으면 끝까지 해낸다</b>',
+      '예고 없는 전환과 큰 소리에 불안해한다',
+    ])}<div class="tb-note"><b>지원 요구</b> 제한적 지원: 그림 단서 · 영상 시범 · 전환 예고 · 할 말을 적은 역할 카드 · 소음 조절</div>`,
+    level: `<div class="tb-h">현행수준</div><dl class="lv">
+      <dt>수학</dt><dd>100 이하의 수를 세고 한 자리 수를 더하고 뺀다. 두 수량 중 많은 쪽을 고른다. 분수 · 비율(1/10)은 모른다</dd>
+      <dt>화폐</dt><dd>매점에서 1,000원 이하 물건을 혼자 산다. 거스름돈은 도움이 필요하다</dd>
+      <dt>의사소통</dt><dd>2~3어절로 답한다. 할 말 카드가 있으면 또래에게 말한다</dd>
+      <dt>행동·감각</dt><dd>큰 소리에 귀를 막는다. 헤드폰에 익숙하다. 15분이 넘으면 집중이 흐트러진다</dd>
+      <dt>기기</dt><dd>태블릿 영상을 스스로 재생 · 정지 · 되감기한다</dd>
+      <dt class="key">학습 방식</dt><dd class="key">시범을 직접 보거나 <b>영상으로 볼 때 가장 잘 따라 한다</b></dd></dl>`,
+    iep: `<div class="tb-h">IEP 목표 <small>2학기 단기 목표</small></div><div class="iep">
+      <div><b>수학(자료)</b><span>절차 영상을 보고 뽑기 결과 10회를 스티커 막대그래프로 나타내고 가장 긴 막대를 찾는다 <em>3회기 연속 80% 이상</em></span>${chip('수학 · 정보')}</div>
+      <div><b>수학(화폐)</b><span>낸 토큰과 받은 토큰을 쌓아 많은 쪽을 고른다</span>${chip('수학')}</div>
+      <div><b>사회(자기 결정)</b><span>그림 카드 두 장 중 하나를 고르고 이유 한 가지를 말한다</span>${chip('사회')}</div>
+      <div><b>의사소통</b><span>스크립트 카드를 보고 모둠 결과를 1문장 이상 또래에게 말한다</span>${chip('정보')}</div>
+      <div><b>행동(전환)</b><span>1분 전 예고를 받고 2분 안에 다음 스테이션으로 이동한다 <em>5회 중 4회</em></span>${chip('전환')}</div></div>`,
+    strength: `<div class="tb-h">강점: 도움만 받는 친구가 아니다</div>
+      <div class="st-chips">${['집중력', '절차 기억', '규칙을 정직하게', '자기만의 관점'].map((t) => `<span>${t}</span>`).join('')}</div>
+      <div class="st-role"><div><b>수학 · 진행자</b>20번의 차례를 세고, 토큰이 캡슐에 다시 들어갔는지 확인한다 → 모둠 데이터가 정확해진다</div>
+        <div><b>정보 · 발표자</b>그래프에서 가장 긴 막대를 찾아 모둠에 알려 준다</div></div>
+      <div class="st-say">“A가 20번 모두 다시 넣었는지 확인해서<br>우리 모둠 기록을 믿을 수 있어요”</div>
+      <div class="tb-note">자폐성장애의 일반 특성이 아니라, 관찰로 확인한 <b>A 개인의 강점</b>으로 다룬다</div>`,
+  };
+  def('profile', {
+    html: () => `<div><div class="rc pf-card"><i class="clip"></i>
+      <div class="rc-top"><span>학생 기록 카드</span><span>지도안 Ⅳ.2 · 가상 설정</span></div>
+      <div class="rc-main"><div class="rc-photo">${PAWN.A}</div>
+        <div class="rc-f"><div class="nm"><b>학생 A</b><span>자폐성장애 <small>경도 지적장애 동반</small></span></div>
+          <dl><dt>학년·성별</dt><dd>중학교 2학년 · 남학생 (만 14세)</dd>
+            <dt>배치</dt><dd>특수학급 소속 · 이 시간 통합학급으로 시간제 통합</dd>
+            <dt>검사</dt><dd>K-WISC-V 62 · CARS-2 35 · KISE-BAAT(수학) 68</dd></dl></div></div>
+      ${tabs([['who', '특성'], ['level', '현행수준'], ['iep', 'IEP 목표'], ['strength', '강점']])}
+      ${panes(PF_BODY)}</div></div>`,
+    enter(tl, at) { tl.fromTo(this.q('.pf-card'), { y: 60, rotation: 2, opacity: 0 }, { y: 0, rotation: 0.4, opacity: 1, duration: 0.7, ease: 'power3.out' }, at); },
+    mode(tl, m, prev, at) { tabMode(this, tl, m, prev, at); },
+    after(tl, m, at) {
+      if (m === 'strength') tl.fromTo(this.qa('.st-chips span'), { scale: 0.85, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.35, stagger: 0.1, ease: 'back.out(2)' }, at);
+    },
+  });
+
+  // ── 관련 연구 분석: 연구 노트 (지도안 Ⅴ) ──────────────
+  // 결과 그래프: 논문이 보고한 단계별 평균 정반응률 (회기별 자료가 아니다)
+  const PHASES = ['기초선', '중재 1', '중재 2', '중재 3', '유지'];
+  const SERIES = [
+    { k: '덧셈', v: [0, 100, 100, 100, 96.7], c: '#213A63' },
+    { k: '뺄셈', v: [0, 86.7, 90, 100, 96.7], c: '#C8952A' },
+    { k: '곱셈', v: [0, 83.3, 96.7, 100, 96.7], c: '#8A5A3B' },
+  ];
+  function resultSVG() {
+    const W0 = 600, H0 = 400, L = 64, R0 = 570, T0 = 54, B0 = 340;
+    const x = (i) => L + i * ((R0 - L) / 4), y = (v) => B0 - (v / 100) * (B0 - T0);
+    let g = '';
+    [0, 50, 100].forEach((v) => { g += `<line x1="${L}" x2="${R0}" y1="${y(v)}" y2="${y(v)}" class="grid"/><text x="${L - 12}" y="${y(v) + 7}" text-anchor="end" class="ax">${v}%</text>`; });
+    g += `<line x1="${(x(0) + x(1)) / 2}" x2="${(x(0) + x(1)) / 2}" y1="${T0 - 8}" y2="${B0}" class="ph"/>`;
+    PHASES.forEach((p, i) => { g += `<text x="${x(i)}" y="${B0 + 36}" text-anchor="middle" class="ax">${p}</text>`; });
+    // 세 선이 끝에서 겹치므로 이름은 위쪽 범례로. 기초선과 중재 사이는 잇지 않는다 (단일대상연구 그래프의 관례)
+    SERIES.forEach((s, n) => {
+      g += `<polyline pathLength="1" class="ln" stroke="${s.c}" points="${s.v.slice(1).map((v, i) => `${x(i + 1)},${y(v)}`).join(' ')}"/>`;
+      g += s.v.map((v, i) => `<circle class="pt" cx="${x(i)}" cy="${y(v)}" r="6" fill="${s.c}"/>`).join('');
+      g += `<g class="lb"><line x1="${L + n * 120}" x2="${L + n * 120 + 30}" y1="14" y2="14" stroke="${s.c}" stroke-width="4"/><text x="${L + n * 120 + 38}" y="21" fill="${s.c}">${s.k}</text></g>`;
+    });
+    return `<svg class="res" viewBox="0 0 ${W0} ${H0}">${g}</svg>`;
+  }
+  const PP_BODY = {
+    info: `<div class="pp3">
+      <div class="pp-c"><div class="tb-h">대상</div>${li(['중학교 1학년 남학생 1명 (14세)', '자폐성장애 · CARS 35', '특수학급 소속, <b>시간제 통합</b>', '수학 문제해결 백분위 3%'])}
+        <div class="stamp">학생 A와 같은 조건</div></div>
+      <div class="pp-c"><div class="tb-h">설계</div><p>행동 간 지연된 중다기초선설계</p>
+        <svg class="mb" viewBox="0 0 260 120">${['덧셈', '뺄셈', '곱셈'].map((t, i) => `<text x="0" y="${24 + i * 38}">${t}</text><line x1="56" x2="${92 + i * 50}" y1="${18 + i * 38}" y2="${18 + i * 38}" class="base"/><line x1="${92 + i * 50}" x2="252" y1="${18 + i * 38}" y2="${18 + i * 38}" class="trt"/>`).join('')}</svg>
+        <p class="cap">세 행동에 차례로 중재를 시작한다 (구조도)</p></div>
+      <div class="pp-c"><div class="tb-h">중재</div>${li(['태블릿 PC <b>비디오 자기 모델링</b> (피드포워드)', '문항: 기본교육과정 <b>화폐의 계산</b> (물건값, 거스름돈)', '영상: 태블릿 내장 카메라 + 기본 편집 프로그램'])}</div></div>`,
+    result: `<div class="pp-res"><div><div class="tb-h">문장제 정반응률 <small>단계별 평균 (논문 보고값)</small></div>${resultSVG()}</div>
+      <div class="pp-big"><div class="big">0% <i>→</i> 96.7%</div><p>기초선에서 유지기까지, 세 행동 모두</p>
+        <p class="sub">영상을 <b>10개 → 5개 → 0개</b>로 줄여도<br>2주 뒤까지 유지됐다</p>
+        <div class="qual"><span>채점자 간 신뢰도 100%</span><span>중재충실도 94%</span><span>사회적 타당도 63.6점 (기준 52.5)</span></div>
+        <p class="lim">한계: 대상 1명, 비슷한 문항 반복에 따른 학습 효과</p></div></div>`,
+    how: `<div class="tb-h">영상 만들기: 과제분석 → 촉구하며 녹화 → 촉구 장면 삭제</div>
+      <div class="flow">
+        <div><b>① 소리 내어 읽기</b><span>${chip('말하기 · 듣기')}${chip('국어', 'k')}</span></div>
+        <div><b>② 단서에 동그라미</b><span>${chip('보기 · 쓰기')}${chip('국어 독해', 'k')}</span></div>
+        <div><b>③ 식 세우기</b><span>${chip('수학', 'm')}</span></div>
+        <div><b>④ 계산</b><span>${chip('수학', 'm')}</span></div></div>
+      <p class="flow-note">혼자 해내는 모습만 남긴 약 1분 30초 영상 30개. 아직 못 하는 것을 <b>“해내는 나”</b>로 먼저 본다.<br>
+        <small>우리 분석: 절차 자체가 여러 감각과 교과를 오간다 → 융합수업에 옮기기 자연스럽다</small></p>
+      <div class="tb-h">용암: 영상을 줄여 간다</div>
+      <div class="fade">${[[10, '1단계'], [5, '2단계'], [0, '3단계']].map(([n, t]) => `<div><b>${t}</b><span class="film">${Array.from({ length: 10 }, (_, i) => `<i class="${i < n ? 'on' : ''}"></i>`).join('')}</span><em>영상 ${n}개</em></div>`).join('<i class="arr">→</i>')}</div>
+      <p class="fade-rule">연속 3회기 평균 80% 이상이면 다음 단계로</p>`,
+    apply: `<div class="pp-apply"><div><div class="tb-h">왜 이 방법인가</div><div class="why">
+        <div><b>대상이 같다</b>특수학급 소속, 시간제 통합, 자폐성장애 중학생</div>
+        <div><b>지적장애 동반에도 맞다</b>여러 단계 말 지시 대신 한 단계씩 보이는 시범</div>
+        <div><b>내용이 이어진다</b>화폐의 계산 ↔ 1,000원 내고 얼마를 돌려받나</div>
+        <div><b>통합학급에서 혼자 참여</b>용암으로 교사 촉구 없이 모둠 안에서</div>
+        <div><b>모두에게 열린 도구</b>모든 모둠이 같은 태블릿으로 교사 시범을 본다</div>
+        <div><b>저자의 제언을 잇는다</b>다교과 접근 → 수학 · 사회 · 정보 융합</div></div></div>
+      <div><div class="tb-h">수학 스테이션 과제분석 5단계</div><ol class="steps5">
+        <li>통에서 캡슐 1개 뽑기</li><li>캡슐 열어 토큰 색 보기</li><li>같은 색 칸에 스티커 붙이기</li><li>토큰을 넣어 닫고 통에 돌려놓기</li><li>통을 짝에게 넘기기</li></ol>
+        <div class="now"><b>본시 = 중재 2단계</b>시작할 때 영상 1번 (이어폰) · 처음 5번은 필요할 때 다시 · 이후 영상 없이</div>
+        <div class="now info"><b>정보 스테이션 4단계</b>소리 내어 읽기 → '횟수'에 동그라미 → 가장 긴 막대 → 말하기 · 10번 영상, 100번 필요할 때, 1,000번 없이</div></div></div>`,
+  };
+  def('paper', {
+    html: () => `<div><div class="sheet ws-paper">
+      <div class="sh-top"><span>관련 연구 분석 · 지도안 Ⅴ</span><span>특수교육재활과학연구 54(4), 2015</span></div>
+      <h3>스마트기기를 활용한 비디오 자기 모델링이 자폐스펙트럼장애 학생의 수학 문장제 문제해결에 미치는 효과</h3>
+      <div class="sh-sub">최진혁 · 김일수 · 박재국</div>
+      ${tabs([['info', '대상과 설계'], ['result', '결과'], ['how', '방법'], ['apply', '우리 수업에 적용']])}
+      ${panes(PP_BODY)}</div></div>`,
+    enter(tl, at) { tl.fromTo(this.q('.sheet'), { y: 50, rotation: -1.5, opacity: 0 }, { y: 0, rotation: -0.3, opacity: 1, duration: 0.7, ease: 'power3.out' }, at); },
+    mode(tl, m, prev, at) { tabMode(this, tl, m, prev, at); },
+    after(tl, m, at) {
+      if (m === 'result') {
+        tl.fromTo(this.qa('.res .ln'), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 1.1, stagger: 0.25, ease: 'power1.inOut' }, at);
+        tl.fromTo(this.qa('.res .pt, .res .lb'), { opacity: 0 }, { opacity: 1, duration: 0.3, stagger: 0.02 }, at + 0.2);
+      }
+      if (m === 'how') tl.fromTo(this.qa('.film i.on'), { opacity: 0 }, { opacity: 1, duration: 0.15, stagger: 0.04 }, at + 0.3);
+    },
+  });
+
+  // ── 지원 메모: 3D 교실에서 빛나는 것의 설명 (학생 기록 카드와 같은 물건) ──
+  const VOCAB_ICON = `<svg viewBox="0 0 60 44"><rect x="2" y="2" width="56" height="40" fill="#FBF8F1" stroke="#213A63" stroke-width="2"/><rect x="2" y="2" width="56" height="6" fill="#213A63"/><rect x="8" y="14" width="30" height="7" fill="#213A63"/><rect x="8" y="26" width="44" height="4" fill="#8A847A"/><rect x="8" y="34" width="34" height="4" fill="#8A847A"/></svg>`;
+  const NOTE = {
+    lead: { pic: PAWN.A, who: '학생 A: 수학 스테이션 진행자', what: '태블릿에서 자기 모습이 담긴 절차 영상(5단계)을 이어폰으로 한 번 보고 시작합니다. 20번의 차례를 횟수판에 세고, 토큰이 캡슐에 다시 들어갔는지 확인합니다. 이 규칙이 지켜져야 모둠의 데이터가 정확해집니다', std: '강점으로 기여하는 역할 · 지도안 Ⅷ.1' },
+    vocab: { pic: VOCAB_ICON, who: '어려운 말은 쉬운 말로 먼저', what: '"상대도수"는 먼저 <b>전체 중에서 그 색이 나온 비율</b>이라고 말하고, 식(나온 횟수 ÷ 전체 횟수)은 그다음에 보입니다. 카드는 스테이션마다 두고 누구나 봅니다', std: '지도안 Ⅺ.6 핵심 어휘 풀이 카드 · 기초소양(언어)' },
+    info: { pic: PAWN.A, who: '학생 A: 정보 스테이션 발표자', what: '논문의 절차를 블록 코드에 옮긴 4단계 영상: <b>소리 내어 읽기 → \'횟수\'에 동그라미하고 버튼 → 가장 긴 막대 찾기 → 스크립트로 말하기</b>. 10번 실행은 영상을 보고, 100번은 필요할 때, 1,000번은 영상 없이 합니다', std: '비디오 자기 모델링 · 용암 · 지도안 Ⅴ.3, 전개 ③' },
+    all: { pic: PAWN.all, who: '모두를 위한 지원', what: '같은 태블릿, 일과표, 역할 카드, 어휘 카드가 처음부터 모든 모둠의 책상에 놓여 있었습니다. 다른 모둠은 교사 시범 영상을, A는 자기 모습 영상을 볼 뿐입니다. 그래서 눈에 띄지 않습니다', more: '같은 설계 위에 지원을 하나 더하면 다른 장애 학생도 함께할 수 있습니다. 예: 시각장애 · 촉각 점 토큰, 청각장애 · 자막 태블릿', std: 'UDL · 통합교육 4대 원리 ② 자연스러운 비가시적 지원' },
+  };
+  def('note', {
+    html: () => `<div><div class="cap-strip rc"><i class="clip"></i><div class="cap-in"></div></div></div>`,
+    enter(tl, at) { tl.fromTo(this.q('.cap-strip'), { y: 40, rotation: -1, opacity: 0 }, { y: 0, rotation: -0.3, opacity: 1, duration: 0.6, ease: 'power3.out' }, at); },
+    mode(tl, m, prev, at) {
+      const L = NOTE[m];
+      swap(tl, this.q('.cap-in'), `<div class="rc-photo${m === 'all' ? ' wide' : ''}">${L.pic}</div>
+        <div><div class="who">${L.who}</div><div class="what">${L.what}</div>${L.more ? `<div class="more">${L.more}</div>` : ''}<div class="std">근거 · ${L.std}</div></div>`, at, prev === undefined);
     },
   });
 

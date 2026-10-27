@@ -133,15 +133,15 @@
     D.$('#doc-speaker').innerHTML = who ? `발표 <b>${who}</b>` : '';
   };
 
-  // 부록 Ⅹ.1 지원 카드 표: [{ area, support, basis }]
-  Doc.cardRows = function () {
+  // 부록 Ⅺ.6 핵심 어휘 풀이 카드 표: [{ word, easy, ex }]
+  Doc.vocabRows = function () {
     for (const table of D.$$('table', body)) {
       const head = D.$$('thead th', table).map((th) => th.textContent.trim());
-      if (head[0] === '영역' && head.some((h) => h.includes('추가 지원'))) {
+      if (head[0] === '어휘' && head[1] && head[1].includes('풀이')) {
         return D.$$('tbody tr', table).map((r) => ({
-          area: r.cells[0].textContent.trim(),
-          support: r.cells[1].textContent.trim(),
-          basis: (r.cells[2] || {}).textContent ? r.cells[2].textContent.trim() : '',
+          word: r.cells[0].textContent.trim(),
+          easy: r.cells[1].textContent.trim(),
+          ex: r.cells[2] ? r.cells[2].textContent.trim() : '',
         }));
       }
     }
